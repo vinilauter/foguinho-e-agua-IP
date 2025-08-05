@@ -1,94 +1,20 @@
 ﻿import pygame
-import sys
+from sys import exit
 
 # Inicialização
-pygame.init()
-LARGURA, ALTURA = 800, 600
-JANELA = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Fogo & Água - Nível 1")
-FPS = 60
-GRAVIDADE = 0.5
 
+pygame.init()
+JANELA = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("Fireboy and Watergirl: Python Version")
+clock = pygame.time.Clock()
 
 # Música de fundo (SE FOR COLOCAR!!)
 #pygame.mixer.music.load("musica.mp3") # Música fica no diretório do jogo
 #pygame.mixer.music.play(-1)
 
-# Cores
-BRANCO = (255, 255, 255)
-VERMELHO = (200, 50, 50)
-AZUL = (50, 100, 255)
-CINZA = (128, 128, 128)
-PRETO = (0, 0, 0)
-
 # Estados do jogo
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
-class Jogador:
-    def __init__(self, x, y, cor, controles):
-        self.retangulo = pygame.Rect(x, y, 40, 60)
-        self.cor = cor
-        self.controles = controles
-        self.vel_y = 0
-        self.no_chao = False
-
-    def controlar(self, teclas):
-        if teclas[self.controles["esquerda"]]:
-            self.retangulo.x -= 5
-        if teclas[self.controles["direita"]]:
-            self.retangulo.x += 5
-
-        # Limites horizontais
-        if self.retangulo.left < 0:
-            self.retangulo.left = 0
-        if self.retangulo.right > LARGURA:
-            self.retangulo.right = LARGURA
-
-        # Pular
-        if teclas[self.controles["pular"]] and self.no_chao:
-            self.vel_y = -15
-            self.no_chao = False
-            # som_pulo.play()  (COLOCA SE HOUVER SOM DE PULO)
-
-
-    def aplicar_gravidade(self):
-        self.retangulo.y += self.vel_y
-        self.vel_y += GRAVIDADE
-
-    def checar_colisao(self, plataformas):
-        self.no_chao = False
-        for plataforma in plataformas:
-            if self.retangulo.colliderect(plataforma.retangulo):
-                if self.vel_y > 0:
-                    self.retangulo.bottom = plataforma.retangulo.top
-                    self.vel_y = 0
-                    self.no_chao = True
-
-    def desenhar(self, tela):
-        pygame.draw.rect(tela, self.cor, self.retangulo)
-
-class Plataforma:
-    def __init__(self, x, y, largura, altura):
-        self.retangulo = pygame.Rect(x, y, largura, altura)
-
-    def desenhar(self, tela):
-        pygame.draw.rect(tela, CINZA, self.retangulo)
-
-class Lago:
-    def __init__(self, x, y, largura, altura):
-        self.retangulo = pygame.Rect(x, y, largura, altura)
-
-    def desenhar(self, tela):
-        pygame.draw.rect(tela, (173, 216, 230), self.retangulo)
-
-
-class Objetivo:
-    def __init__(self, x, y, cor):
-        self.retangulo = pygame.Rect(x, y, 40, 60)
-        self.cor = cor
-
-    def desenhar(self, tela):
-        pygame.draw.rect(tela, self.cor, self.retangulo, 3)
 
 class Jogo:
     def __init__(self):
@@ -168,7 +94,7 @@ class Jogo:
 
 
     def desenhar(self):
-        JANELA.fill(PRETO)
+        JANELA.fill('Black')
 
         if self.estado == MENU:
             self.desenhar_texto("Pressione ESPAÇO para começar", 200, 250)
@@ -194,3 +120,12 @@ class Jogo:
 
 if __name__ == "__main__":
     Jogo().executar()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+    pygame.display.update()
+    clock.tick(60)
