@@ -90,9 +90,31 @@ class Objetivo:
     def desenhar(self, tela):
         pygame.draw.rect(tela, self.cor, self.retangulo, 3)
 
+class Diamante:
+    def __init__(self, x, y):
+        self.retangulo = pygame.Rect(x, y, 20, 20)
+        self.coletado = False
+
+    def desenhar(self, tela):
+        if not self.coletado:
+            pontos = [
+                (self.retangulo.centerx, self.retangulo.top),
+                (self.retangulo.right, self.retangulo.centery),
+                (self.retangulo.centerx, self.retangulo.bottom),
+                (self.retangulo.left, self.retangulo.centery)
+            ]
+            pygame.draw.polygon(tela, (0, 255, 255), pontos)
+
+class Porta:
+    def __init__(self, x, y):
+        self.retangulo = pygame.Rect(x, y, 50, 80)
+
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, (0, 255, 0), self.retangulo, 3)
+
 class Jogo:
     def __init__(self):
-        self.lago = Lago(300, 520, 200, 40)
+        self.lago = Lago(300, ALTURA - 30, 200, 40)
 
         self.tempo_limite = 60
         self.tempo_inicial = pygame.time.get_ticks()
@@ -114,14 +136,20 @@ class Jogo:
         })
 
         self.plataformas = [
-            Plataforma(0, ALTURA - 40, LARGURA, 40),
+            Plataforma(0, ALTURA - 40, 300, 40),
+            Plataforma(500, ALTURA - 40, 300, 40),
             Plataforma(150, 450, 500, 20),
             Plataforma(100, 300, 200, 20),
             Plataforma(500, 200, 200, 20)
         ]
 
-        self.objetivo1 = Objetivo(100, 240, VERMELHO)
-        self.objetivo2 = Objetivo(600, 140, AZUL)
+        self.porta = Porta(700, ALTURA - 120)
+
+        self.diamantes = [
+            Diamante(180, 420),
+            Diamante(550, 170),
+            Diamante(250, 270),
+        ]
 
     def executar(self):
         while True:
@@ -152,19 +180,33 @@ class Jogo:
                 jogador.aplicar_gravidade()
                 jogador.checar_colisao(self.plataformas)
 
-            if (self.jogador1.retangulo.colliderect(self.objetivo1.retangulo) and
-                self.jogador2.retangulo.colliderect(self.objetivo2.retangulo)):
-                self.estado = VITORIA
+            # Verifica se o jogador caiu no lago
+            for jogador in [self.jogador1, self.jogador2]:
+                if jogador.retangulo.colliderect(self.lago.retangulo):
+                    self.__init__()  # reinicia o jogo
+                    return
 
+            # Verifica coleta de diamantes
+            for diamante in self.diamantes:
+                for jogador in [self.jogador1, self.jogador2]:
+                    if not diamante.coletado and jogador.retangulo.colliderect(diamante.retangulo):
+                        diamante.coletado = True
+
+            # Verifica se todos os diamantes foram coletados
+            todos_coletados = all(d.coletado for d in self.diamantes)
+
+            # Se todos os diamantes foram coletados, checa entrada na porta
+            if todos_coletados:
+                if (self.jogador1.retangulo.colliderect(self.porta.retangulo) and
+                    self.jogador2.retangulo.colliderect(self.porta.retangulo)):
+                    self.estado = VITORIA
+
+        # Atualiza o tempo restante
         tempo_passado = (pygame.time.get_ticks() - self.tempo_inicial) / 1000
         self.tempo_restante = max(0, self.tempo_limite - int(tempo_passado))
 
         if self.tempo_restante == 0 and self.estado == JOGANDO:
-            self.__init__()
-
-        for jogador in [self.jogador1, self.jogador2]:
-            if jogador.retangulo.colliderect(self.lago.retangulo):
-                self.__init__()  # volta para o menu
+            self.__init__()  # volta para o menu
 
 
     def desenhar(self):
@@ -175,8 +217,12 @@ class Jogo:
         elif self.estado == JOGANDO:
             for plataforma in self.plataformas:
                 plataforma.desenhar(JANELA)
-            self.objetivo1.desenhar(JANELA)
-            self.objetivo2.desenhar(JANELA)
+            for diamante in self.diamantes:
+                diamante.desenhar(JANELA)
+
+            todos_coletados = all(d.coletado for d in self.diamantes)
+            if todos_coletados:
+                self.porta.desenhar(JANELA)
             self.jogador1.desenhar(JANELA)
             self.jogador2.desenhar(JANELA)
         elif self.estado == VITORIA:
@@ -184,6 +230,9 @@ class Jogo:
         if self.estado == JOGANDO:
             self.lago.desenhar(JANELA)
             self.desenhar_texto(f"Tempo: {self.tempo_restante}", 10, 10)
+            total = len(self.diamantes)
+            coletados = sum(1 for d in self.diamantes if d.coletado)
+            self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 40)
 
 
         pygame.display.flip()
