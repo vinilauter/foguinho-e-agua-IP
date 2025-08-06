@@ -1,6 +1,7 @@
 ﻿﻿import pygame
 import sys
-from alavanca import alavanca
+from alavanca import Alavanca
+from jogador import Jogador
 
 # Inicialização
 pygame.init()
@@ -19,6 +20,7 @@ AZUL = (50, 100, 255)
 CINZA = (128, 128, 128)
 PRETO = (0, 0, 0)
 
+Alavanca()
 # Estados do jogo
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
