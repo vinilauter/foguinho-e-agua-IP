@@ -5,7 +5,7 @@ tela = pygame.display.set_mode((largura, altura)) # Tamanho da tela não definid
 
 # Classe jogador
 class Jogador(pygame.sprite.Sprite):
-    def __init__(self, cor, controles):
+    def __init__(self, posição_lateral_inicial, posicao_vertical_inicial, cor, controles): # Posição de inicio | Criador do nível...
         super().__init__()
         self.image = pygame.Surface((40, 60))  # Tamanho padrão do personagem | Só um exemplo, a gnt discute
         self.image.fill(cor)
@@ -41,8 +41,8 @@ controles_agua = {
 }
 
 # Criação dos personagens
-fogo = Jogador((255, 0, 0), controles_fogo)
-agua = Jogador((0, 0, 255), controles_agua)
+fogo = Jogador(posicao_lateral_inicial, posicao_vertical_inicial, cor, controles_fogo) # Posição inicial e cor a definir
+agua = Jogador(posicao_lateral_inicial, posicao_vertical_inicial, cor, controles_agua) # Posição inicial e cor a definir
 
 # Posição inicial não definida | Criador do nível...
 # fogo.rect.topleft = (100, 300)
