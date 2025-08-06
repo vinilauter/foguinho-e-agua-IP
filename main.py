@@ -1,14 +1,12 @@
 ﻿﻿import pygame
 import sys
+from alavanca import alavanca
 
 # Inicialização
 pygame.init()
 LARGURA, ALTURA = 800, 600
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Fogo & Água - Nível 1")
-FPS = 60
-GRAVIDADE = 0.5
-
+pygame.display.set_caption("Fireboy and Watergirl: Python version")
 
 # Música de fundo (SE FOR COLOCAR!!)
 #pygame.mixer.music.load("musica.mp3") # Música fica no diretório do jogo
@@ -49,11 +47,7 @@ class Jogador:
             self.vel_y = -15
             self.no_chao = False
             # som_pulo.play()  (COLOCA SE HOUVER SOM DE PULO)
-
-
-    def aplicar_gravidade(self):
-        self.retangulo.y += self.vel_y
-        self.vel_y += GRAVIDADE
+    
 
     def checar_colisao(self, plataformas):
         self.no_chao = False
