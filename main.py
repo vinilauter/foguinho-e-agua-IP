@@ -20,35 +20,8 @@ AZUL = (50, 100, 255)
 CINZA = (128, 128, 128)
 PRETO = (0, 0, 0)
 
-Alavanca()
 # Estados do jogo
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
-
-class Jogador:
-    def __init__(self, x, y, cor, controles):
-        self.retangulo = pygame.Rect(x, y, 40, 60)
-        self.cor = cor
-        self.controles = controles
-        self.vel_y = 0
-        self.no_chao = False
-
-    def controlar(self, teclas):
-        if teclas[self.controles["esquerda"]]:
-            self.retangulo.x -= 5
-        if teclas[self.controles["direita"]]:
-            self.retangulo.x += 5
-
-        # Limites horizontais
-        if self.retangulo.left < 0:
-            self.retangulo.left = 0
-        if self.retangulo.right > LARGURA:
-            self.retangulo.right = LARGURA
-
-        # Pular
-        if teclas[self.controles["pular"]] and self.no_chao:
-            self.vel_y = -15
-            self.no_chao = False
-            # som_pulo.play()  (COLOCA SE HOUVER SOM DE PULO)
     
 
     def checar_colisao(self, plataformas):
