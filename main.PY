@@ -194,3 +194,47 @@ class Jogo:
 
 if __name__ == "__main__":
     Jogo().executar()
+# main.py
+# Importa a sua classe Nivel
+from mechanics.level import Nivel
+
+def main():
+    pygame.init()
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("Fireboy and Watergirl")
+
+    # AQUI ESTÁ A CONEXÃO!
+    # 1. Instancie (crie) o seu objeto Nivel
+    nivel_atual = Nivel()
+    
+    # ... (Seu código para criar os jogadores Fireboy e Watergirl, que ainda
+    #     estão no main.py, mas que futuramente serão movidos) ...
+
+    running = True
+    while running:
+        # Processamento de eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        # Lógica de atualização aqui (futuramente)
+        
+        # --------------------
+        # Desenho
+        # --------------------
+        screen.fill((0, 0, 0))
+
+        # 2. Chame o método 'draw' do seu objeto Nivel
+        nivel_atual.draw(screen)
+        
+        # ... (código para desenhar os jogadores) ...
+        
+        pygame.display.flip()
+
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()
