@@ -1,4 +1,5 @@
-﻿
+import pygame
+
 class Alavanca(pygame.sprite.Sprite):
 
     def __init__(self, posicao, cor, ativada=False):
