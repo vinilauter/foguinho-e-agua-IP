@@ -3,6 +3,7 @@ import pygame
 class Jogador(pygame.sprite.Sprite):
     def __init__(self, x, y, cor, controles):
         super().__init__()
+        self.cor = cor
         self.image = pygame.Surface((40, 60))
         self.image.fill(cor)
         self.rect = self.image.get_rect()
@@ -21,7 +22,7 @@ class Jogador(pygame.sprite.Sprite):
         self.vel_x = 0
 
         if teclas[self.controles["esquerda"]]:
-            self.vel_x = -4 
+            self.vel_x = -4  # Velocidade horizontal menor para maior controle
         if teclas[self.controles["direita"]]:
             self.vel_x = 4
 
@@ -36,7 +37,6 @@ class Jogador(pygame.sprite.Sprite):
             self.vel_y += self.gravidade
         self.rect.y += self.vel_y
 
-    # Pular apenas quando estiver no chão
     def checar_colisao(self, plataformas):
         self.pode_pular = False
 
@@ -50,6 +50,5 @@ class Jogador(pygame.sprite.Sprite):
                     self.rect.top = plataforma.retangulo.bottom
                     self.vel_y = 0
 
-    # Desenha o personagem no local de caida
     def desenhar(self, tela):
         tela.blit(self.image, self.rect)
