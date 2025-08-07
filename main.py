@@ -1,36 +1,28 @@
-﻿import pygame
+import pygame
 import sys
-from alavanca import Alavanca # DIRETORIO DAS ALAVANCAS DEVE COMECAR COM A PASTA IMAGENS CASO ESTA PASTA ESTEJA NO DIRETORIO DO MAIN.PY
-from jogador import Jogador # PRECISA CRIAR O ATRIBUTO COR DO JOGADOR PARA FICAR COMPATIVEL COM DIAMANTES_COLECIONAVEIS.PY
+from alavanca import Alavanca
+from jogador import Jogador
 from foguinho import Foguinho
 from agua import Agua
-from plataforma_movel import Botao_Plataforma_Movel
-from plataforma_movel import PlataformaMovel
+from plataforma_movel import (Botao_Plataforma_Movel, PlataformaMovel)
+from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
 
-# Inicialização
 pygame.init()
 LARGURA, ALTURA = 800, 600
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
-from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
-carregar_sprites_diamantes() # EM DIAMANTES_COLECIONAVEIS.PY jogador.RECT.colliderect NO LUGAR DE RETANGULO
-# PARA FICAR COMPATÍVEL COM JOGADOR.PY (??), TAMBEM AJUSTAR O DIRETORIO PARA IMAGENS
+
+carregar_sprites_diamantes()
 pygame.display.set_caption("Fogo & Água: Python Version")
 FPS = 60
 
-# Música de fundo (SE FOR COLOCAR!!)
-#pygame.mixer.music.load("musica.mp3") # Música fica no diretório do jogo
-#pygame.mixer.music.play(-1)
-
-# Cores
 BRANCO = (255, 255, 255)
 VERMELHO = (200, 50, 50)
 AZUL = (50, 100, 255)
 CINZA = (128, 128, 128)
 PRETO = (0, 0, 0)
 
-# Estados do jogo
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
-    
+
 class Plataforma:
     def __init__(self, x, y, largura, altura):
         self.retangulo = pygame.Rect(x, y, largura, altura)
@@ -44,7 +36,6 @@ class Lago:
 
     def desenhar(self, tela):
         pygame.draw.rect(tela, (173, 216, 230), self.retangulo)
-
 
 class Objetivo:
     def __init__(self, x, y, cor):
@@ -97,6 +88,10 @@ class Jogo:
 
         self.diamantes = [DiamanteVermelho(180, 420), DiamanteAzul(550, 170), DiamanteVermelho(250, 270)]
 
+        # Instanciar botão e plataforma móvel
+        self.botao_movel = Botao_Plataforma_Movel(350, 280)
+        self.plataforma_movel = PlataformaMovel(350, 250, 100, 20, 350, velocidade=2)
+
     def executar(self):
         while True:
             self.relogio.tick(FPS)
@@ -113,7 +108,7 @@ class Jogo:
                 if self.estado == MENU and evento.key == pygame.K_SPACE:
                     self.estado = JOGANDO
                 elif self.estado == VITORIA and evento.key == pygame.K_r:
-                    self.__init__()  # reinicia o jogo
+                    self.__init__()
 
     def atualizar(self):
         teclas = pygame.key.get_pressed()
@@ -127,37 +122,36 @@ class Jogo:
                 jogador.aplicar_gravidade()
                 jogador.checar_colisao(self.plataformas)
 
-            # Verifica se o jogador caiu no lago
+            # Atualizar botão e plataforma móvel
+            self.botao_movel.verificar_ativacao([self.jogador1, self.jogador2])
+            self.plataforma_movel.atualizar(self.botao_movel)
+
             for jogador in [self.jogador1, self.jogador2]:
                 if jogador.rect.colliderect(self.lago.retangulo):
-                    self.__init__()  # reinicia o jogo
+                    self.__init__()
                     return
 
-            # Verifica coleta de diamantes
             for diamante in self.diamantes:
                 for jogador in [self.jogador1, self.jogador2]:
                     diamante.checar_coleta(jogador)
-            
+
             for alavanca in self.alavancas:
                 for jogador in [self.jogador1, self.jogador2]:
                     if jogador.rect.colliderect(alavanca.rect) and not alavanca.ativada:
                         alavanca.toggle()
 
-            # Verifica se todos os diamantes foram coletados
             todos_coletados = all(d.coletado for d in self.diamantes)
 
-            # Se todos os diamantes foram coletados, checa entrada na porta
             if todos_coletados:
                 if (self.jogador1.rect.colliderect(self.porta.retangulo) and
                     self.jogador2.rect.colliderect(self.porta.retangulo)):
                     self.estado = VITORIA
 
-        # Atualiza o tempo restante
         tempo_passado = (pygame.time.get_ticks() - self.tempo_inicial) / 1000
         self.tempo_restante = max(0, self.tempo_limite - int(tempo_passado))
 
         if self.tempo_restante == 0 and self.estado == JOGANDO:
-            self.__init__()  # volta para o menu
+            self.__init__()
 
     def desenhar(self):
         JANELA.fill(PRETO)
@@ -171,16 +165,21 @@ class Jogo:
                 diamante.desenhar(JANELA)
             for alavanca in self.alavancas:
                 JANELA.blit(alavanca.image, alavanca.rect.topleft)
-            
+
             todos_coletados = all(d.coletado for d in self.diamantes)
-            
             if todos_coletados:
                 self.porta.desenhar(JANELA)
             self.alavancas.draw(JANELA)
             self.jogador1.desenhar(JANELA)
             self.jogador2.desenhar(JANELA)
+
+            # Desenhar botão e plataforma móvel
+            self.botao_movel.desenhar(JANELA)
+            self.plataforma_movel.desenhar(JANELA)
+
         elif self.estado == VITORIA:
             self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250)
+
         if self.estado == JOGANDO:
             self.lago.desenhar(JANELA)
             self.desenhar_texto(f"Tempo: {self.tempo_restante}", 10, 10)
