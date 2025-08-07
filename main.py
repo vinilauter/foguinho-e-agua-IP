@@ -1,16 +1,17 @@
-﻿﻿import pygame
+﻿import pygame
 import sys
-from alavanca import Alavanca # DIRETORIO DAS ALAVANCAS DEVE COMECAR COM A PASTA IMAGENS
-# CASO ESTA PASTA ESTEJA NO DIRETORIO DO MAIN.PY
+from alavanca import Alavanca # DIRETORIO DAS ALAVANCAS DEVE COMECAR COM A PASTA IMAGENS CASO ESTA PASTA ESTEJA NO DIRETORIO DO MAIN.PY
 from jogador import Jogador # PRECISA CRIAR O ATRIBUTO COR DO JOGADOR PARA FICAR COMPATIVEL COM DIAMANTES_COLECIONAVEIS.PY
 from foguinho import Foguinho
 from agua import Agua
+from plataforma_movel import Botao_Plataforma_Movel
+from plataforma_movel import PlataformaMovel
 
 # Inicialização
 pygame.init()
 LARGURA, ALTURA = 800, 600
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
-from diamantes_colecionaveis import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
+from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
 carregar_sprites_diamantes() # EM DIAMANTES_COLECIONAVEIS.PY jogador.RECT.colliderect NO LUGAR DE RETANGULO
 # PARA FICAR COMPATÍVEL COM JOGADOR.PY (??), TAMBEM AJUSTAR O DIRETORIO PARA IMAGENS
 pygame.display.set_caption("Fogo & Água: Python Version")
@@ -72,13 +73,13 @@ class Jogo:
         self.fonte = pygame.font.Font(None, 36)
         self.estado = MENU
 
-        self.jogador1 = Jogador(100, 500, VERMELHO, {
+        self.jogador1 = Foguinho(100, 500, {
             "esquerda": pygame.K_a,
             "direita": pygame.K_d,
             "pular": pygame.K_w
         })
 
-        self.jogador2 = Jogador(200, 500, AZUL, {
+        self.jogador2 = Agua(200, 500, {
             "esquerda": pygame.K_LEFT,
             "direita": pygame.K_RIGHT,
             "pular": pygame.K_UP
