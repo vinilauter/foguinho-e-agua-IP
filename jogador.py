@@ -1,43 +1,55 @@
 import pygame
-from foguinho import Foguinho
-from agua import Agua
 
 class Jogador(pygame.sprite.Sprite):
-    def __init__(self, posicao_x, posicao_y, controles):
+    def __init__(self, x, y, cor, controles):
         super().__init__()
-        self.image = pygame.Surface((40, 60))  # Substituído pelas imagens nas subclasses
+        self.image = pygame.Surface((40, 60))
+        self.image.fill(cor)
         self.rect = self.image.get_rect()
-        self.rect.topleft = (posicao_x, posicao_y)
+        self.rect.topleft = (x, y)
 
         self.controles = controles
         self.vel_x = 0
         self.vel_y = 0
+        self.pode_pular = False
+
+        self.forca_pulo = -10       # Pulo com força moderada
+        self.gravidade = 0.5        # Gravidade mais suave
+        self.vel_y_max = 10         # Velocidade terminal na queda
 
     def update(self, teclas):
         self.vel_x = 0
-        if teclas[self.controles['esquerda']]:
-            self.vel_x = -5
-        if teclas[self.controles['direita']]:
-            self.vel_x = 5
+
+        if teclas[self.controles["esquerda"]]:
+            self.vel_x = -4 
+        if teclas[self.controles["direita"]]:
+            self.vel_x = 4
+
+        if teclas[self.controles["pular"]] and self.pode_pular:
+            self.vel_y = self.forca_pulo
+            self.pode_pular = False  # Impede pulo duplo
+
         self.rect.x += self.vel_x
 
-# Controles dos personagens
-controles_fogo = {
-    'pular': pygame.K_UP,
-    'esquerda': pygame.K_LEFT,
-    'direita': pygame.K_RIGHT   
-}
+    def aplicar_gravidade(self):
+        if self.vel_y < self.vel_y_max:
+            self.vel_y += self.gravidade
+        self.rect.y += self.vel_y
 
-controles_agua = {
-    'pular': pygame.K_w,
-    'esquerda': pygame.K_a,
-    'direita': pygame.K_d
-}
+    # Pular apenas quando estiver no chão
+    def checar_colisao(self, plataformas):
+        self.pode_pular = False
 
-# Jogadores
-foguinho = Foguinho(posicao_x, posicao_y, controles_fogo)
-agua = Agua(posicao_x, posicao_y, controles_agua)
+        for plataforma in plataformas:
+            if self.rect.colliderect(plataforma.retangulo):
+                if self.vel_y > 0 and self.rect.bottom <= plataforma.retangulo.bottom:
+                    self.rect.bottom = plataforma.retangulo.top
+                    self.vel_y = 0
+                    self.pode_pular = True
+                elif self.vel_y < 0:
+                    self.rect.top = plataforma.retangulo.bottom
+                    self.vel_y = 0
 
-jogadores = pygame.sprite.Group()
-jogadores.add(foguinho)
-jogadores.add(agua)
+    # Desenha o personagem no local de caida
+    def desenhar(self, tela):
+        tela.blit(self.image, self.rect)
