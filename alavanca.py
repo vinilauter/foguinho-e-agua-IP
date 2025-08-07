@@ -5,8 +5,8 @@ class Alavanca(pygame.sprite.Sprite):
     def __init__(self, posicao, cor, ativada=False):
         super().__init__()
 
-        caminho_ligada = f"foguinho-e-agua-IP/Imagens/alavanca_{cor}_ON.png"
-        caminho_desligada = f"foguinho-e-agua-IP/Imagens/alavanca_{cor}_OFF.png"
+        caminho_ligada = f"alavanca_branca_ON.png"
+        caminho_desligada = f"alavanca_branca_OFF.png"
 
         self.img_ligada = pygame.image.load(caminho_ligada)
         self.img_desligada = pygame.image.load(caminho_desligada)
@@ -26,4 +26,3 @@ class Alavanca(pygame.sprite.Sprite):
     def toggle(self):
         self.ativada = not self.ativada
         self.update()
-
