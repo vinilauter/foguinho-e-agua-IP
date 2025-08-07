@@ -3,6 +3,7 @@ from jogador import Jogador
 
 class Foguinho(Jogador):
     def __init__(self, posicao_x, posicao_y, controles):
-        super().__init__(posicao_x, posicao_y, controles)
-        self.image = pygame.image.load("").convert_alpha() # Definir sprite
-        self.image = pygame.transform.scale(self.image, (40, 60)) 
+        cor = (200, 50, 50)  # Vermelho
+        super().__init__(posicao_x, posicao_y, cor, controles)
+        self.image = pygame.image.load("fogo.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (40, 60))
