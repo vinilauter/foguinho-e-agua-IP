@@ -135,6 +135,11 @@ class Jogo:
             for diamante in self.diamantes:
                 for jogador in [self.jogador1, self.jogador2]:
                     diamante.checar_coleta(jogador)
+            
+            for alavanca in self.alavancas:
+                for jogador in [self.jogador1, self.jogador2]:
+                    if jogador.rect.colliderect(alavanca.rect) and not alavanca.ativada:
+                        alavanca.toggle()
 
             # Verifica se todos os diamantes foram coletados
             todos_coletados = all(d.coletado for d in self.diamantes)
@@ -162,6 +167,8 @@ class Jogo:
                 plataforma.desenhar(JANELA)
             for diamante in self.diamantes:
                 diamante.desenhar(JANELA)
+            for alavanca in self.alavancas:
+                JANELA.blit(alavanca.image, alavanca.rect.topleft)
             
             todos_coletados = all(d.coletado for d in self.diamantes)
             
