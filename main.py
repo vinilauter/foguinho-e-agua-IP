@@ -6,7 +6,11 @@ from foguinho import Foguinho
 from agua import Agua
 from plataforma_movel import (Botao_Plataforma_Movel, PlataformaMovel)
 from diamante import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
+from cronometro import Cronometro
+from porta_final import Porta_final
+from plataforma_vertical_alavanca import Plataforma_movel_vertical
 
+# Inicializar o Pygame
 pygame.init()
 LARGURA, ALTURA = 800, 600
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
