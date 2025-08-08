@@ -7,3 +7,4 @@ class Foguinho(Jogador):
         super().__init__(posicao_x, posicao_y, cor, controles)
         self.image = pygame.image.load("fireboy.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (40, 60))
+        self.retangulo = self.image.get_rect(topleft=(posicao_x, posicao_y))
