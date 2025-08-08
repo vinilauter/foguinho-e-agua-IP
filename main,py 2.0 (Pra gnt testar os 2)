@@ -1,0 +1,223 @@
+import pygame
+import sys
+from alavanca import Alavanca
+from jogador import Jogador
+from foguinho import Foguinho
+from agua import Agua
+from plataforma_movel import (Botao_Plataforma_Movel, PlataformaMovel)
+from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
+
+pygame.init()
+LARGURA, ALTURA = 800, 600
+JANELA = pygame.display.set_mode((LARGURA, ALTURA))
+
+carregar_sprites_diamantes()
+pygame.display.set_caption("Fogo & Água: Python Version")
+FPS = 60
+
+BRANCO = (255, 255, 255)
+VERMELHO = (200, 50, 50)
+AZUL = (50, 100, 255)
+CINZA = (128, 128, 128)
+PRETO = (0, 0, 0)
+
+MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
+
+class Plataforma:
+    def __init__(self, x, y, largura, altura):
+        self.retangulo = pygame.Rect(x, y, largura, altura)
+
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, CINZA, self.retangulo)
+
+class Lago:
+    def __init__(self, x, y, largura, altura):
+        self.retangulo = pygame.Rect(x, y, largura, altura)
+
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, (173, 216, 230), self.retangulo)
+
+class Objetivo:
+    def __init__(self, x, y, cor):
+        self.retangulo = pygame.Rect(x, y, 40, 60)
+        self.cor = cor
+
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, self.cor, self.retangulo, 3)
+
+class Porta:
+    def __init__(self, x, y):
+        self.retangulo = pygame.Rect(x, y, 50, 80)
+
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, (0, 255, 0), self.retangulo, 3)
+
+# ... (importações continuam iguais)
+
+class Jogo:
+    def __init__(self):
+        self.relogio = pygame.time.Clock()
+        self.fonte = pygame.font.Font(None, 36)
+        self.estado = MENU
+
+        # Tempo contado como cronômetro crescente
+        self.tempo_inicial = pygame.time.get_ticks()
+        self.tempo_limite = 9999  # apenas como margem
+
+        # Jogadores posicionados conforme imagem
+        self.jogador1 = Foguinho(390, 45, { "esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w })
+        self.jogador2 = Agua(430, 45, { "esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP })
+
+        # Plataformas fixas do mapa
+        self.plataformas = [
+            Plataforma(370, 100, 80, 10),
+            Plataforma(80, 180, 100, 10),
+            Plataforma(220, 180, 60, 10),
+            Plataforma(320, 180, 100, 10),
+            Plataforma(500, 180, 120, 10),
+            Plataforma(670, 180, 90, 10),
+            Plataforma(100, 270, 140, 10),
+            Plataforma(320, 270, 180, 10),
+            Plataforma(550, 270, 130, 10),
+            Plataforma(80, 360, 120, 10),
+            Plataforma(270, 360, 150, 10),
+            Plataforma(450, 360, 130, 10),
+            Plataforma(630, 360, 130, 10),
+            Plataforma(60, 460, 120, 10),
+            Plataforma(250, 460, 110, 10),
+            Plataforma(400, 460, 150, 10),
+            Plataforma(590, 460, 110, 10),
+            Plataforma(700, 540, 100, 10),
+            Plataforma(0, ALTURA - 40, 800, 40),  # chão
+        ]
+
+        # Alavancas
+        self.alavancas = pygame.sprite.Group()
+        self.alavancas.add(
+            Alavanca((95, 160), "amarela"),
+            Alavanca((665, 160), "amarela"),
+            Alavanca((220, 255), "azul"),
+        )
+
+        # Portas finais
+        self.porta = Porta(50, 515)
+        self.porta_agua = Objetivo(50, 520, AZUL)
+        self.porta_fogo = Objetivo(750, 520, VERMELHO)
+
+        # Diamantes (vermelhos e azuis)
+        self.diamantes = [
+            DiamanteVermelho(180, 140),
+            DiamanteVermelho(370, 340),
+            DiamanteVermelho(600, 240),
+            DiamanteAzul(100, 340),
+            DiamanteAzul(350, 140),
+            DiamanteAzul(650, 320),
+        ]
+
+        # Lagos (lava e água)
+        self.lagos = [
+            Lago(110, 110, 100, 20),  # lava (vermelha no original)
+            Lago(500, 110, 120, 20),  # água
+        ]
+
+        # Botões e plataforma móvel
+        self.botao_movel = Botao_Plataforma_Movel(400, 340)
+        self.plataforma_movel = PlataformaMovel(400, 300, 100, 10, 400, velocidade=2)
+
+    def executar(self):
+        while True:
+            self.relogio.tick(FPS)
+            self.tratar_eventos()
+            self.atualizar()
+            self.desenhar()
+
+    def tratar_eventos(self):
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif evento.type == pygame.KEYDOWN:
+                if self.estado == MENU and evento.key == pygame.K_SPACE:
+                    self.estado = JOGANDO
+                elif self.estado == VITORIA and evento.key == pygame.K_r:
+                    self.__init__()
+
+    def atualizar(self):
+        teclas = pygame.key.get_pressed()
+
+        if self.estado == JOGANDO:
+            self.jogador1.update(teclas)
+            self.jogador2.update(teclas)
+            self.alavancas.update()
+
+            for jogador in [self.jogador1, self.jogador2]:
+                jogador.aplicar_gravidade()
+                jogador.checar_colisao(self.plataformas)
+
+            self.botao_movel.verificar_ativacao([self.jogador1, self.jogador2])
+            self.plataforma_movel.atualizar(self.botao_movel)
+
+            for lago in self.lagos:
+                for jogador in [self.jogador1, self.jogador2]:
+                    if jogador.rect.colliderect(lago.retangulo):
+                        self.__init__()
+                        return
+
+            for diamante in self.diamantes:
+                for jogador in [self.jogador1, self.jogador2]:
+                    diamante.checar_coleta(jogador)
+
+            for alavanca in self.alavancas:
+                for jogador in [self.jogador1, self.jogador2]:
+                    if jogador.rect.colliderect(alavanca.rect) and not alavanca.ativada:
+                        alavanca.toggle()
+
+            if all(d.coletado for d in self.diamantes):
+                if (self.jogador1.rect.colliderect(self.porta_fogo.retangulo) and
+                    self.jogador2.rect.colliderect(self.porta_agua.retangulo)):
+                    self.estado = VITORIA
+
+        tempo_passado = (pygame.time.get_ticks() - self.tempo_inicial) / 1000
+        self.tempo_restante = int(tempo_passado)
+
+    def desenhar(self):
+        JANELA.fill(PRETO)
+
+        if self.estado == MENU:
+            self.desenhar_texto("Pressione ESPAÇO para começar", 200, 250)
+
+        elif self.estado == JOGANDO:
+            for plataforma in self.plataformas:
+                plataforma.desenhar(JANELA)
+            for lago in self.lagos:
+                lago.desenhar(JANELA)
+            for diamante in self.diamantes:
+                diamante.desenhar(JANELA)
+            for alavanca in self.alavancas:
+                JANELA.blit(alavanca.image, alavanca.rect.topleft)
+
+            self.alavancas.draw(JANELA)
+            self.jogador1.desenhar(JANELA)
+            self.jogador2.desenhar(JANELA)
+            self.botao_movel.desenhar(JANELA)
+            self.plataforma_movel.desenhar(JANELA)
+            self.porta_agua.desenhar(JANELA)
+            self.porta_fogo.desenhar(JANELA)
+
+        elif self.estado == VITORIA:
+            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250)
+
+        if self.estado == JOGANDO:
+            self.desenhar_texto(f"Tempo: {self.tempo_restante}", 10, 10)
+            total = len(self.diamantes)
+            coletados = sum(1 for d in self.diamantes if d.coletado)
+            self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 40)
+
+        pygame.display.flip()
+
+    def desenhar_texto(self, texto, x, y):
+        rotulo = self.fonte.render(texto, True, BRANCO)
+        JANELA.blit(rotulo, (x, y))
+
+if __name__ == "__main__":
+    Jogo().executar()
