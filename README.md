@@ -45,3 +45,11 @@ Também houve o primeiro commit do arquivo Main, pouco antes do primeiro checkpo
 ## Dia 5 - primeiras features e arquivo main (05/08/2025)
 
 No dia 5 de agosto o membro Vinicius fez o commit das primeiras features parcialmente prontas, as alavancas com modularidade de cor e a gravidade aplicada aos personagens, o membro Robson também criou e fez várias otimizações no esqueleto do arquivo main, com a criação de diversos esboços de classes importantes para o jogo.
+
+## Dia 6 - segundo checkpoint (06/08/2025)
+
+No dia 6 de agosto foi feito um checkpoint presencial com a professora Fernanda Madeiral, foram alinhadas as expectativas e apresentado o projeto, com tudo correndo bem e a sinalização de que estamos no caminho certo.
+
+## Dia 8 - terceiro checkpoint (08/08/2025)
+
+No dia 8 de agosto foi feito um checkpoint presencial com os monitores designados, atualizando-os das novas features em estágio de implementação e a explicação de como está sendo a estruturação do repositório em arquivos separados, no mais a maioria das features já foi esboçada e a equipe logo iniciará uma fase de integração e alinhamento para a inclusão correta de cada funcionalidade na main.
