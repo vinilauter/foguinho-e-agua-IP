@@ -9,8 +9,8 @@ DIAMANTE_AZUL_SPRITE = None
 def carregar_sprites_diamantes() :
     """OBS: chame essa função no main.py depois de pygame.init()"""
     global DIAMANTE_VERMELHO_SPRITE, DIAMANTE_AZUL_SPRITE
-    DIAMANTE_VERMELHO_SPRITE = pygame.image.load("Imagens\diamante_vermelho.png").convert_alpha()
-    DIAMANTE_AZUL_SPRITE = pygame.image.load("\Imagens\diamante_azul.png").convert_alpha()
+    DIAMANTE_VERMELHO_SPRITE = pygame.image.load("Imagens/diamante_vermelho.png").convert_alpha()
+    DIAMANTE_AZUL_SPRITE = pygame.image.load("\Imagens/diamante_azul.png").convert_alpha()
 
 
 class Diamante :
