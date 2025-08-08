@@ -5,7 +5,7 @@ from jogador import Jogador
 from foguinho import Foguinho
 from agua import Agua
 from plataforma_movel import (Botao_Plataforma_Movel, PlataformaMovel)
-from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
+from diamante import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
 
 pygame.init()
 LARGURA, ALTURA = 800, 600
