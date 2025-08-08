@@ -7,8 +7,8 @@ class Botao_Plataforma_Movel :
     def __init__(self, x, y) :
         self.pressionado = False
 
-        self.imagem_levantado = pygame.image.load('botao_solto.png').convert_alpha()
-        self.imagem_abaixado = pygame.image.load('botao_pressionado.png').convert_alpha()
+        self.imagem_levantado = pygame.image.load('Imagens/botao_solto.png').convert_alpha()
+        self.imagem_abaixado = pygame.image.load('Imagens/botao_pressionado.png').convert_alpha()
         # Não consegui achar as sprites dos botões do jogo então editei umas mas acho que ficou meio estranho
 
         self.retangulo = self.imagem_levantado.get_rect(center=(x, y + 30))

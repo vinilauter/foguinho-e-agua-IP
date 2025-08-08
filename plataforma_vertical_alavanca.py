@@ -5,7 +5,7 @@ class Plataforma_movel_vertical(pygame.sprite.Sprite):
     def __init__(self, posicao_inicial, posicao_final, alavanca_designada, cor, ativada=False):
         super().__init__()
         
-        caminho_imagem= f"plataforma_movel_vertica_{cor}.png"
+        caminho_imagem= f"Imagens/plataforma_movel_vertica_{cor}.png"
 
         self.image = pygame.image.load(caminho_imagem).convert_alpha()
         self.rect = self.image.get_rect(midbottom=posicao_inicial)
