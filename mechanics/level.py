@@ -18,14 +18,12 @@ class PocaDeAgua:
     
     def draw(self, screen):
         pygame.draw.rect(screen, (100, 150, 250), self.rect)
-
-# Aqui é onde a sua classe Nivel é definida e populada
+        
 class Nivel:
     def __init__(self):
         self.platforms = []
         self.water_pools = []
-        
-        # Crie e adicione os objetos aqui!
+
         # Chão
         chao = Platform(x=0, y=550, width=800, height=50)
         self.platforms.append(chao)
