@@ -5,13 +5,13 @@ class Alavanca(pygame.sprite.Sprite):
     def __init__(self, posicao, cor, ativada=False):
         super().__init__()
 
-        caminho_ligada = f"alavanca_branca_ON.png"
-        caminho_desligada = f"alavanca_branca_OFF.png"
+        caminho_ligada = f"alavanca_{cor}_ON.png"
+        caminho_desligada = f"alavanca_{cor}_OFF.png"
 
-        self.img_ligada = pygame.image.load(caminho_ligada)
-        self.img_desligada = pygame.image.load(caminho_desligada)
+        self.img_ligada = pygame.image.load(caminho_ligada).convert_alpha()
+        self.img_desligada = pygame.image.load(caminho_desligada).convert_alpha()
+
         self.image = self.img_desligada
-
         self.rect = self.img_desligada.get_rect(midbottom=posicao)
         
         self.posicao = posicao
