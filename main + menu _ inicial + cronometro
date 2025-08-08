@@ -94,7 +94,7 @@ class Jogo:
         self.fonte_titulo = pygame.font.Font(None, 74)
         self.estado = MENU
         
-        self.cronometro = CronometroCrescente(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
+        self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
 
         # <-- MUDANÇA: Carrega a imagem da moldura
         self.moldura_timer_img = pygame.image.load("moldura_timer.png").convert_alpha()
