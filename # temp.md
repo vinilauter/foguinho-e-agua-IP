@@ -1,1 +1,1 @@
-Faltam as imagens dos botões, personagens, background e utilidade para as alavancas, bem como a possibilidade do personagem poder ficar sobre a plataforma móvel (atualmente ele apenas a atravessa).
+Faltam as imagens dos botões, personagens, background e utilidade para as alavancas, bem como a possibilidade do personagem poder ficar sobre a plataforma móvel (atualmente ele apenas a atravessa). E o desenho do nível.
