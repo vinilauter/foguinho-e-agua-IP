@@ -39,24 +39,18 @@ class Botao_Plataforma_Movel :
 class PlataformaMovel :
     """ Plataforma se move de acordo com o estado do botão """
 
-    def __init__(self, x, y, largura, altura, y_final, velocidade=1) :
-        self.retangulo = pygame.Rect(x, y, largura, altura)
-        self.cor = CINZA_ESCURO
-        self.pos_inicial_y = y
-        self.pos_final_y = y_final
-        self.velocidade = velocidade
+    def __init__(self, x, y, largura, altura, end, vel):
+        self.rect = pygame.Rect(x, y, largura, altura)
+        self.pos_inicial = x
+        self.pos_final = end
+        self.vel = vel
+        self.direcao = 1
 
-    def atualizar(self, botao_plataforma_movel) :
-        if botao_plataforma_movel.pressionado:
-            if self.retangulo.y < self.pos_final_y :
-                self.retangulo.y += self.velocidade
-                if self.retangulo.y > self.pos_final_y :
-                    self.retangulo.y = self.pos_final_y  
-        else :
-            if self.retangulo.y > self.pos_inicial_y :
-                self.retangulo.y -= self.velocidade
-                if self.retangulo.y < self.pos_inicial_y:
-                    self.retangulo.y = self.pos_inicial_y  
+    def atualizar(self, ativado):
+        if ativado:
+            self.rect.x += self.vel * self.direcao
+            if self.rect.x <= min(self.pos_inicial, self.pos_final) or self.rect.x >= max(self.pos_inicial, self.pos_final):
+                self.direcao *= -1
 
-    def desenhar(self, tela) :
-        pygame.draw.rect(tela, self.cor, self.retangulo)
+    def desenhar(self, tela):
+        pygame.draw.rect(tela, (150, 0, 255), self.rect)
