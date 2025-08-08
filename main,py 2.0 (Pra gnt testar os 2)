@@ -8,7 +8,7 @@ from plataforma_movel import (Botao_Plataforma_Movel, PlataformaMovel)
 from diamantes import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul, COR_DIAMANTE_VERMELHO, COR_DIAMANTE_AZUL)
 
 pygame.init()
-LARGURA, ALTURA = 800, 600
+LARGURA, ALTURA = 1400, 1000
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
 
 carregar_sprites_diamantes()
@@ -52,77 +52,77 @@ class Porta:
     def desenhar(self, tela):
         pygame.draw.rect(tela, (0, 255, 0), self.retangulo, 3)
 
-# ... (importações continuam iguais)
-
 class Jogo:
     def __init__(self):
         self.relogio = pygame.time.Clock()
         self.fonte = pygame.font.Font(None, 36)
         self.estado = MENU
 
-        # Tempo contado como cronômetro crescente
         self.tempo_inicial = pygame.time.get_ticks()
-        self.tempo_limite = 9999  # apenas como margem
+        self.tempo_limite = 9999
 
-        # Jogadores posicionados conforme imagem
-        self.jogador1 = Foguinho(390, 45, { "esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w })
-        self.jogador2 = Agua(430, 45, { "esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP })
+        # Personagens
+        self.jogador2 = Agua(int(430 * 1.75), int(45 * 1.66), { "esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w })
+        self.jogador1 = Foguinho(int(390 * 1.75), int(45 * 1.66), { "esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP })
 
-        # Plataformas fixas do mapa
         self.plataformas = [
-            Plataforma(370, 100, 80, 10),
-            Plataforma(80, 180, 100, 10),
-            Plataforma(220, 180, 60, 10),
-            Plataforma(320, 180, 100, 10),
-            Plataforma(500, 180, 120, 10),
-            Plataforma(670, 180, 90, 10),
-            Plataforma(100, 270, 140, 10),
-            Plataforma(320, 270, 180, 10),
-            Plataforma(550, 270, 130, 10),
-            Plataforma(80, 360, 120, 10),
-            Plataforma(270, 360, 150, 10),
-            Plataforma(450, 360, 130, 10),
-            Plataforma(630, 360, 130, 10),
-            Plataforma(60, 460, 120, 10),
-            Plataforma(250, 460, 110, 10),
-            Plataforma(400, 460, 150, 10),
-            Plataforma(590, 460, 110, 10),
-            Plataforma(700, 540, 100, 10),
-            Plataforma(0, ALTURA - 40, 800, 40),  # chão
+            Plataforma(int(370*1.75), int(100*1.66), int(80*1.75), int(10*1.66)),
+            Plataforma(int(80*1.75), int(180*1.66), int(100*1.75), int(10*1.66)),
+            Plataforma(int(220*1.75), int(180*1.66), int(60*1.75), int(10*1.66)),
+            Plataforma(int(320*1.75), int(180*1.66), int(100*1.75), int(10*1.66)),
+            Plataforma(int(500*1.75), int(180*1.66), int(120*1.75), int(10*1.66)),
+            Plataforma(int(670*1.75), int(180*1.66), int(90*1.75), int(10*1.66)),
+            Plataforma(int(100*1.75), int(270*1.66), int(140*1.75), int(10*1.66)),
+            Plataforma(int(320*1.75), int(270*1.66), int(180*1.75), int(10*1.66)),
+            Plataforma(int(550*1.75), int(270*1.66), int(130*1.75), int(10*1.66)),
+            Plataforma(int(80*1.75), int(360*1.66), int(120*1.75), int(10*1.66)),
+            Plataforma(int(270*1.75), int(360*1.66), int(150*1.75), int(10*1.66)),
+            Plataforma(int(450*1.75), int(360*1.66), int(130*1.75), int(10*1.66)),
+            Plataforma(int(630*1.75), int(360*1.66), int(130*1.75), int(10*1.66)),
+            Plataforma(int(60*1.75), int(460*1.66), int(120*1.75), int(10*1.66)),
+            Plataforma(int(250*1.75), int(460*1.66), int(110*1.75), int(10*1.66)),
+            Plataforma(int(400*1.75), int(460*1.66), int(150*1.75), int(10*1.66)),
+            Plataforma(int(590*1.75), int(460*1.66), int(110*1.75), int(10*1.66)),
+            Plataforma(int(700*1.75), int(540*1.66), int(100*1.75), int(10*1.66)),
+            Plataforma(0, ALTURA - 40, LARGURA, 40),
         ]
 
-        # Alavancas
+
+        parede_esquerda = Plataforma(0, 0, 20, ALTURA)
+        parede_direita = Plataforma(LARGURA - 20, 0, 20, ALTURA)
+        teto = Plataforma(0, 0, LARGURA, 20)
+
+        self.plataformas.append(parede_esquerda)
+        self.plataformas.append(parede_direita)
+        self.plataformas.append(teto)
+
         self.alavancas = pygame.sprite.Group()
         self.alavancas.add(
-            Alavanca((95, 160), "amarela"),
-            Alavanca((665, 160), "amarela"),
-            Alavanca((220, 255), "azul"),
+            Alavanca((int(95*1.75), int(160*1.66)), "amarela"),
+            Alavanca((int(665*1.75), int(160*1.66)), "amarela"),
+            Alavanca((int(220*1.75), int(255*1.66)), "azul"),
         )
 
-        # Portas finais
-        self.porta = Porta(50, 515)
-        self.porta_agua = Objetivo(50, 520, AZUL)
-        self.porta_fogo = Objetivo(750, 520, VERMELHO)
+        self.porta = Porta(int(50*1.75), int(515*1.66))
+        self.porta_agua = Objetivo(int(50*1.75), int(520*1.66), AZUL)
+        self.porta_fogo = Objetivo(int(750*1.75), int(520*1.66), VERMELHO)
 
-        # Diamantes (vermelhos e azuis)
         self.diamantes = [
-            DiamanteVermelho(180, 140),
-            DiamanteVermelho(370, 340),
-            DiamanteVermelho(600, 240),
-            DiamanteAzul(100, 340),
-            DiamanteAzul(350, 140),
-            DiamanteAzul(650, 320),
+            DiamanteVermelho(int(180*1.75), int(140*1.66)),
+            DiamanteVermelho(int(370*1.75), int(340*1.66)),
+            DiamanteVermelho(int(600*1.75), int(240*1.66)),
+            DiamanteAzul(int(100*1.75), int(340*1.66)),
+            DiamanteAzul(int(350*1.75), int(140*1.66)),
+            DiamanteAzul(int(650*1.75), int(320*1.66)),
         ]
 
-        # Lagos (lava e água)
         self.lagos = [
-            Lago(110, 110, 100, 20),  # lava (vermelha no original)
-            Lago(500, 110, 120, 20),  # água
+            Lago(int(110*1.75), int(110*1.66), int(100*1.75), int(20*1.66)),
+            Lago(int(500*1.75), int(110*1.66), int(120*1.75), int(20*1.66)),
         ]
 
-        # Botões e plataforma móvel
-        self.botao_movel = Botao_Plataforma_Movel(400, 340)
-        self.plataforma_movel = PlataformaMovel(400, 300, 100, 10, 400, velocidade=2)
+        self.botao_movel = Botao_Plataforma_Movel(int(400*1.75), int(340*1.66))
+        self.plataforma_movel = PlataformaMovel(int(400*1.75), int(300*1.66), int(100*1.75), int(10*1.66), int(400*1.75), velocidade=2)
 
     def executar(self):
         while True:
