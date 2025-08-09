@@ -13,6 +13,7 @@ class Cronometro:
         self.cor = cor
         self.tempo_inicial = 0
         self.tempo_decorrido_segundos = 0
+        self.centralizado = False  # Padrão: não centralizado
         self.reset()
 
     def reset(self):
@@ -26,13 +27,17 @@ class Cronometro:
 
     def desenhar(self, tela):
         """Desenha o tempo decorrido no formato MM:SS na tela."""
-        # Converte o total de segundos para minutos e segundos
         total_segundos_int = int(self.tempo_decorrido_segundos)
         minutos = total_segundos_int // 60
         segundos = total_segundos_int % 60
-        
-        # Formata o texto para sempre ter dois dígitos (ex: 01:05)
-        texto = f"Tempo: {minutos:02d}:{segundos:02d}"
-        
+
+        texto = f"{minutos:02d}:{segundos:02d}"
+
         rotulo = self.fonte.render(texto, True, self.cor)
-        tela.blit(rotulo, self.posicao)
+
+        pos_x, pos_y = self.posicao
+        pos_y_ajustado = pos_y - 10 # sobe o texto 5 pixels
+
+        # Centraliza o texto no ponto ajustado
+        tela.blit(rotulo, (pos_x - rotulo.get_width() // 2, pos_y_ajustado - rotulo.get_height() // 2))
+
