@@ -20,17 +20,17 @@ class Diamante :
         self.coletado = False
         self.tipo = None 
         self.image = None
-        self.retangulo = None
+        self.rect = None
 
     def desenhar(self, tela) :
         if not self.coletado :
-            tela.blit(self.image, self.retangulo.topleft)
+            tela.blit(self.image, self.rect.topleft)
             
     def checar_coleta(self, jogador) :
         if self.coletado :
             return False
 
-        if jogador.retangulo.colliderect(self.retangulo) :
+        if jogador.rect.colliderect(self.rect) :
             if jogador.cor == self.tipo :
                 self.coletado = True
                 return True
@@ -45,7 +45,7 @@ class DiamanteVermelho(Diamante) :
         self.image = DIAMANTE_VERMELHO_SPRITE
         # Eu posicionei a imagem pelo centro pq se não ia ter que cortar a sprite e pra o programa não faz sentido
         # pq quando o personagem toca no triângulo ele desaparece -> não tem colisão entre o triângulo e os personagens
-        self.retangulo = self.image.get_rect(center = (x, y))
+        self.rect = self.image.get_rect(center = (x, y))
 
 class DiamanteAzul(Diamante) :
     """ Diamante só coletado pelo jogador azul """
@@ -56,4 +56,4 @@ class DiamanteAzul(Diamante) :
         self.image = DIAMANTE_AZUL_SPRITE
         # Eu posicionei a imagem pelo centro pq se não ia ter que cortar a sprite e pra o programa não faz sentido
         # pq quando o personagem toca no triângulo ele desaparece -> não tem colisão entre o triângulo e os personagens
-        self.retangulo = self.image.get_rect(center = (x, y))
+        self.rect = self.image.get_rect(center = (x, y))
