@@ -1,29 +1,23 @@
 import pygame
 from plataforma_movel import PlataformaMovel, Botao_Plataforma_Movel
-from jogador import Jogador
 from foguinho import Foguinho
 from agua import Agua
 from diamante import DiamanteVermelho, DiamanteAzul
+from porta_final import Porta_final
 
 class Plataforma:
     def __init__(self, x, y, largura, altura):
-        self.retangulo = pygame.Rect(x, y, largura, altura)
+        self.rect = pygame.Rect(x, y, largura, altura)
     def desenhar(self, tela):
-        pygame.draw.rect(tela, (128, 128, 128), self.retangulo)
+        pygame.draw.rect(tela, (128, 128, 128), self.rect)
 
 class Lago:
     def __init__(self, x, y, largura, altura, tipo):
-        self.retangulo = pygame.Rect(x, y, largura, altura)
+        self.rect = pygame.Rect(x, y, largura, altura)
         self.tipo = tipo
     def desenhar(self, tela):
         cor = (173, 216, 230) if self.tipo == "agua" else (255, 100, 0)
-        pygame.draw.rect(tela, cor, self.retangulo)
-
-class Porta:
-    def __init__(self, x, y):
-        self.retangulo = pygame.Rect(x, y, 50, 80)
-    def desenhar(self, tela):
-        pygame.draw.rect(tela, (0, 255, 0), self.retangulo, 3)
+        pygame.draw.rect(tela, cor, self.rect)
 
 def criar_primeiro_nivel():
     ALTURA = 600
@@ -46,8 +40,9 @@ def criar_primeiro_nivel():
         Lago(420, ALTURA - 30, 80, 30, "lava")
     ]
 
-    porta_fogo = Porta(50, 200)
-    porta_agua = Porta(700, 200)
+    # Portas iniciais estão trancadas; serão destrancadas quando diamantes forem coletados
+    porta_fogo = Porta_final((50, 200), "fogo", trancada=True)
+    porta_agua = Porta_final((700, 200), "agua", trancada=True)
 
     jogador1 = Foguinho(100, ALTURA - 80, {"esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w})
     jogador2 = Agua(200, ALTURA - 80, {"esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP})
@@ -59,6 +54,7 @@ def criar_primeiro_nivel():
         DiamanteAzul(420, 350),
     ]
 
+    # Retorna todos os objetos do nível para serem usados no main.py
     return {
         "jogador1": jogador1,
         "jogador2": jogador2,
