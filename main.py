@@ -6,7 +6,7 @@ from cronometro import Cronometro
 from diamante import carregar_sprites_diamantes
 
 pygame.init()
-LARGURA, ALTURA = 800, 600
+LARGURA, ALTURA = 1280, 720
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
 
 pygame.display.set_caption("Fogo & Água: Python Version")
