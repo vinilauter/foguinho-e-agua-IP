@@ -1,21 +1,14 @@
 import pygame
 import sys
-from nivel import criar_primeiro_nivel, Lago
-from plataforma_movel import PlataformaMovel, Botao_Plataforma_Movel
+from nivel import criar_primeiro_nivel
 from alavanca import Alavanca
-from jogador import Jogador
-from foguinho import Foguinho
-from agua import Agua
-from diamante import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul)
 from cronometro import Cronometro
-from porta_final import Porta_final
-from plataforma_vertical_alavanca import Plataforma_movel_vertical
+from diamante import carregar_sprites_diamantes
 
 pygame.init()
 LARGURA, ALTURA = 800, 600
 JANELA = pygame.display.set_mode((LARGURA, ALTURA))
 
-carregar_sprites_diamantes()
 pygame.display.set_caption("Fogo & Água: Python Version")
 FPS = 60
 
@@ -27,6 +20,8 @@ MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
 class Jogo:
     def __init__(self):
+        carregar_sprites_diamantes()  # Não esqueça de chamar essa função antes de criar os diamantes!
+
         self.alavancas = pygame.sprite.Group()
         self.alavancas.add(Alavanca((400, 430), "branca"), Alavanca((600, 170), "azul"))
         
@@ -36,15 +31,23 @@ class Jogo:
         self.estado = MENU
         self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
 
-        # <-- MUDANÇA: Carrega a imagem da moldura
+        # Moldura do timer
         self.moldura_timer_img = pygame.image.load("Imagens/moldura_timer.png").convert_alpha()
-        self.moldura_timer_img = pygame.transform.scale(self.moldura_timer_img, (120, 50))  # Novo tamanho
-        self.moldura_timer_rect = self.moldura_timer_img.get_rect(midtop=(LARGURA // 2, 10))  # Centraliza no topo
+        self.moldura_timer_img = pygame.transform.scale(self.moldura_timer_img, (150, 65))
+        self.moldura_timer_rect = self.moldura_timer_img.get_rect(midtop=((LARGURA // 2), 0))
+
         
-        # <-- MUDANÇA: Ajusta a posição e a fonte do cronômetro para caber dentro da moldura
-        self.cronometro.posicao = self.moldura_timer_rect.center # Define a posição do texto como o centro da moldura
-        self.cronometro.fonte = pygame.font.Font(None, 28) # Ajusta a fonte para um tamanho menor
-        self.cronometro.centralizado = True # Ativa a flag de centralização do texto
+        # Ajuste do cronômetro para ficar centralizado na moldura do timer
+        self.cronometro.fonte = pygame.font.Font(None, 28)
+        self.cronometro.centralizado = True
+        self.cronometro.posicao = (
+            self.moldura_timer_rect.centerx,
+            self.moldura_timer_rect.top + self.moldura_timer_rect.height // 2
+        )
+
+        # Carrega background e ajusta tamanho
+        self.background = pygame.image.load("Imagens/background.png").convert()
+        self.background = pygame.transform.scale(self.background, (LARGURA, ALTURA))
         
         nivel = criar_primeiro_nivel()
 
@@ -79,45 +82,51 @@ class Jogo:
                     self.__init__()
 
     def atualizar(self):
-        if self.estado != JOGANDO: return
+        if self.estado != JOGANDO: 
+            return
 
         teclas = pygame.key.get_pressed()
         self.jogador1.update(teclas)
         self.jogador2.update(teclas)
-        self.alavancas.update()
-        self.cronometro.update()
 
+        # Gravidade e colisão
         for jogador in [self.jogador1, self.jogador2]:
             jogador.aplicar_gravidade()
             jogador.checar_colisao(self.plataformas)
 
+        # Botões e plataforma móvel
         self.botao_movel_1.verificar_ativacao([self.jogador1, self.jogador2])
         self.botao_movel_2.verificar_ativacao([self.jogador1, self.jogador2])
-        
-        # Ativa a plataforma se pelo menos um botão estiver pressionado
         ativado = self.botao_movel_1.pressionado or self.botao_movel_2.pressionado
         self.plataforma_movel.atualizar(ativado)
 
+        # Verifica se jogador caiu na água ou lava — reinicia o nível
         for jogador in [self.jogador1, self.jogador2]:
             for lago in self.lagos:
-                if jogador.rect.colliderect(lago.retangulo):
-                    # Lógica de morte/reinício
+                if jogador.rect.colliderect(lago.rect):
                     self.__init__()
                     return
 
+        # Checar coleta dos diamantes
         for diamante in self.diamantes:
             for jogador in [self.jogador1, self.jogador2]:
                 diamante.checar_coleta(jogador)
 
-        for alavanca in self.alavancas:
-            for jogador in [self.jogador1, self.jogador2]:
-                if jogador.rect.colliderect(alavanca.rect) and not alavanca.ativada:
-                    alavanca.toggle()
+        # Atualiza cronômetro e alavancas
+        self.alavancas.update()
+        self.cronometro.update()
 
+        # Destrancar portas se todos os diamantes coletados
         todos_coletados = all(d.coletado for d in self.diamantes)
-        if todos_coletados and self.jogador1.rect.colliderect(self.porta.retangulo) and self.jogador2.rect.colliderect(self.porta.retangulo):
-            self.estado = VITORIA
-            
+        if todos_coletados:
+            self.porta_fogo.destrancar(True)
+            self.porta_agua.destrancar(True)
+
+        # Verifica se ambos jogadores estão na porta para vencer
+        if todos_coletados:
+            if self.jogador1.rect.colliderect(self.porta_fogo.rect) and self.jogador2.rect.colliderect(self.porta_agua.rect):
+                self.estado = VITORIA
+
     def desenhar_menu(self):
         JANELA.fill(PRETO)
         texto_titulo = self.fonte_titulo.render("Fogo & Água", True, BRANCO)
@@ -128,16 +137,19 @@ class Jogo:
         JANELA.blit(texto_instrucao, rect_instrucao)
 
     def desenhar(self):
-        JANELA.fill(PRETO)
+        # Desenha o background primeiro para ficar atrás de tudo
+        JANELA.blit(self.background, (0, 0))
 
         if self.estado == MENU:
             self.desenhar_menu()
+
         elif self.estado == JOGANDO:
             for plataforma in self.plataformas: plataforma.desenhar(JANELA)
             for diamante in self.diamantes: diamante.desenhar(JANELA)
-            
-            todos_coletados = all(d.coletado for d in self.diamantes)
-            if todos_coletados: self.porta.desenhar(JANELA)
+
+            # Desenha as portas sempre (imagem já muda conforme trancada/destrancada)
+            self.porta_fogo.desenhar(JANELA)
+            self.porta_agua.desenhar(JANELA)
 
             self.alavancas.draw(JANELA)
             self.jogador1.desenhar(JANELA)
@@ -147,15 +159,13 @@ class Jogo:
             self.plataforma_movel.desenhar(JANELA)
             for lago in self.lagos:
                 lago.desenhar(JANELA)
-            
-            # <-- MUDANÇA: Desenha a moldura PRIMEIRO
+
+            # Moldura do timer e cronometro
             JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
-            # <-- MUDANÇA: Desenha o cronômetro DEPOIS, para que fique por cima
             self.cronometro.desenhar(JANELA)
-            
+
             total = len(self.diamantes)
             coletados = sum(1 for d in self.diamantes if d.coletado)
-            # Usei a fonte_geral para o texto dos diamantes
             self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:

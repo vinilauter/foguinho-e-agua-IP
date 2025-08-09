@@ -9,7 +9,6 @@ from agua import Agua
 from diamante import (carregar_sprites_diamantes, DiamanteVermelho, DiamanteAzul)
 
 # --- Classes de Exemplo (para o código rodar de forma independente) ---
-# Remova estas se você já as tem em arquivos separados e importadas corretamente.
 class PlataformaMovel:
     def __init__(self, x, y, w, h, end, vel): pass
     def atualizar(self, botao): pass
@@ -29,12 +28,12 @@ pygame.display.set_caption("Fogo & Água: Python Version")
 FPS = 60
 
 BRANCO = (255, 255, 255)
+CINZA_CLARO = (200, 200, 200)
 CINZA = (128, 128, 128)
 PRETO = (0, 0, 0)
 
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
-# <-- MUDANÇA: A classe do cronômetro foi levemente ajustada para centralização.
 class Cronometro:
     def __init__(self, fonte, posicao, cor):
         self.fonte = fonte
@@ -42,34 +41,24 @@ class Cronometro:
         self.cor = cor
         self.tempo_inicial = 0
         self.tempo_decorrido_segundos = 0
-        # Flag para saber se o texto deve ser centralizado na sua posição
         self.centralizado = False 
         self.reset()
-
     def reset(self):
         self.tempo_inicial = pygame.time.get_ticks()
         self.tempo_decorrido_segundos = 0
-
     def update(self):
         self.tempo_decorrido_segundos = (pygame.time.get_ticks() - self.tempo_inicial) / 1000
-
     def desenhar(self, tela):
         total_segundos_int = int(self.tempo_decorrido_segundos)
         minutos = total_segundos_int // 60
         segundos = total_segundos_int % 60
-        
-        # <-- MUDANÇA: Removida a palavra "Tempo:" para caber melhor na moldura
         texto = f"{minutos:02d}:{segundos:02d}"
-        
         rotulo = self.fonte.render(texto, True, self.cor)
-
-        # <-- MUDANÇA: Lógica para desenhar o texto centralizado na posição definida
         if self.centralizado:
             rect_rotulo = rotulo.get_rect(center=self.posicao)
             tela.blit(rotulo, rect_rotulo)
         else:
             tela.blit(rotulo, self.posicao)
-
 
 class Plataforma:
     def __init__(self, x, y, largura, altura): self.retangulo = pygame.Rect(x, y, largura, altura)
@@ -85,26 +74,32 @@ class Porta:
 
 class Jogo:
     def __init__(self):
-        self.lago = Lago(300, ALTURA - 30, 200, 40)
-        self.alavancas = pygame.sprite.Group()
-        self.alavancas.add(Alavanca((400, 430), "branca"), Alavanca((600, 170), "azul"))
-        
         self.relogio = pygame.time.Clock()
         self.fonte_geral = pygame.font.Font(None, 36)
         self.fonte_titulo = pygame.font.Font(None, 74)
         self.estado = MENU
         
-        self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
-
-        # <-- MUDANÇA: Carrega a imagem da moldura
-        self.moldura_timer_img = pygame.image.load("moldura_timer.png").convert_alpha()
-        self.moldura_timer_rect = self.moldura_timer_img.get_rect(topleft=(10, 5)) # Posição da moldura
+        # --- Carregamento e configuração dos assets do Menu ---
+        # <-- MUDANÇA: Carrega, redimensiona e converte a imagem de fundo do menu
+        self.fundo_menu_img = pygame.image.load("menu_inicial.jpg").convert()
+        self.fundo_menu_img = pygame.transform.scale(self.fundo_menu_img, (LARGURA, ALTURA))
         
-        # <-- MUDANÇA: Ajusta a posição e a fonte do cronômetro para caber dentro da moldura
-        self.cronometro.posicao = self.moldura_timer_rect.center # Define a posição do texto como o centro da moldura
-        self.cronometro.fonte = pygame.font.Font(None, 28) # Ajusta a fonte para um tamanho menor
-        self.cronometro.centralizado = True # Ativa a flag de centralização do texto
-
+        # <-- MUDANÇA: Variáveis para controlar o texto piscando
+        self.texto_menu_visivel = True
+        self.tempo_ultimo_toggle = pygame.time.get_ticks()
+        
+        # --- Configuração dos assets do Jogo ---
+        self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
+        self.moldura_timer_img = pygame.image.load("moldura_timer.png").convert_alpha()
+        self.moldura_timer_rect = self.moldura_timer_img.get_rect(topleft=(10, 5))
+        self.cronometro.posicao = self.moldura_timer_rect.center
+        self.cronometro.fonte = pygame.font.Font(None, 28)
+        self.cronometro.centralizado = True
+        
+        # --- Inicialização dos elementos do nível ---
+        self.lago = Lago(300, ALTURA - 30, 200, 40)
+        self.alavancas = pygame.sprite.Group()
+        self.alavancas.add(Alavanca((400, 430), "branca"), Alavanca((600, 170), "azul"))
         self.jogador1 = Foguinho(100, 500, {"esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w})
         self.jogador2 = Agua(200, 500, {"esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP})
         self.plataformas = [Plataforma(0, ALTURA - 40, 300, 40), Plataforma(500, ALTURA - 40, 300, 40), Plataforma(150, 450, 500, 20), Plataforma(100, 300, 200, 20), Plataforma(500, 200, 200, 20)]
@@ -132,86 +127,104 @@ class Jogo:
                 elif self.estado == VITORIA and evento.key == pygame.K_r:
                     self.__init__()
 
-    def atualizar(self):
-        if self.estado != JOGANDO: return
+    # <-- MUDANÇA: Novo método para atualizar a lógica do menu
+    def atualizar_menu(self):
+        """Atualiza a lógica do menu, como o texto piscando."""
+        tempo_atual = pygame.time.get_ticks()
+        # A cada 500ms (meio segundo), inverte a visibilidade do texto
+        if tempo_atual - self.tempo_ultimo_toggle > 500:
+            self.texto_menu_visivel = not self.texto_menu_visivel
+            self.tempo_ultimo_toggle = tempo_atual
 
+    def atualizar_jogo(self):
+        """Atualiza toda a lógica do jogo principal."""
         teclas = pygame.key.get_pressed()
         self.jogador1.update(teclas)
         self.jogador2.update(teclas)
         self.alavancas.update()
         self.cronometro.update()
-
         for jogador in [self.jogador1, self.jogador2]:
             jogador.aplicar_gravidade()
             jogador.checar_colisao(self.plataformas)
-
         self.botao_movel.verificar_ativacao([self.jogador1, self.jogador2])
         self.plataforma_movel.atualizar(self.botao_movel)
-
         for jogador in [self.jogador1, self.jogador2]:
             if jogador.rect.colliderect(self.lago.retangulo):
                 self.__init__()
                 return
-
         for diamante in self.diamantes:
             for jogador in [self.jogador1, self.jogador2]:
                 diamante.checar_coleta(jogador)
-
         for alavanca in self.alavancas:
             for jogador in [self.jogador1, self.jogador2]:
                 if jogador.rect.colliderect(alavanca.rect) and not alavanca.ativada:
                     alavanca.toggle()
-
         todos_coletados = all(d.coletado for d in self.diamantes)
         if todos_coletados and self.jogador1.rect.colliderect(self.porta.retangulo) and self.jogador2.rect.colliderect(self.porta.retangulo):
             self.estado = VITORIA
-            
+
+    # <-- MUDANÇA: Método "roteador" de atualização
+    def atualizar(self):
+        if self.estado == MENU:
+            self.atualizar_menu()
+        elif self.estado == JOGANDO:
+            self.atualizar_jogo()
+
+    # <-- MUDANÇA: Método de desenho do menu agora usa a imagem de fundo
     def desenhar_menu(self):
-        JANELA.fill(PRETO)
-        texto_titulo = self.fonte_titulo.render("Fogo & Água", True, BRANCO)
-        rect_titulo = texto_titulo.get_rect(center=(LARGURA / 2, ALTURA / 3))
-        texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA)
-        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2))
-        JANELA.blit(texto_titulo, rect_titulo)
-        JANELA.blit(texto_instrucao, rect_instrucao)
+        JANELA.blit(self.fundo_menu_img, (0, 0))
+        # Só desenha o texto se a flag de visibilidade for True
+        if self.texto_menu_visivel:
+            texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA_CLARO)
+            # Posiciona o texto na parte inferior da tela
+            rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA - 50))
+            JANELA.blit(texto_instrucao, rect_instrucao)
 
+    def desenhar_jogo(self):
+        """Desenha todos os elementos do jogo principal."""
+        JANELA.fill(PRETO)
+        for plataforma in self.plataformas: plataforma.desenhar(JANELA)
+        for diamante in self.diamantes: diamante.desenhar(JANELA)
+        if all(d.coletado for d in self.diamantes): self.porta.desenhar(JANELA)
+        self.alavancas.draw(JANELA)
+        self.jogador1.desenhar(JANELA)
+        self.jogador2.desenhar(JANELA)
+        self.botao_movel.desenhar(JANELA)
+        self.plataforma_movel.desenhar(JANELA)
+        self.lago.desenhar(JANELA)
+        JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
+        self.cronometro.desenhar(JANELA)
+        total = len(self.diamantes)
+        coletados = sum(1 for d in self.diamantes if d.coletado)
+        self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 50, self.fonte_geral)
+    
+    def desenhar_vitoria(self):
+        self.desenhar_jogo() # Mostra o estado final do jogo
+        # Desenha uma sobreposição escura para destacar o texto
+        sobreposicao = pygame.Surface((LARGURA, ALTURA), pygame.SRCALPHA)
+        sobreposicao.fill((0, 0, 0, 180))
+        JANELA.blit(sobreposicao, (0, 0))
+        # Escreve o texto de vitória
+        self.desenhar_texto("Vocês Venceram!", LARGURA / 2, ALTURA / 3, self.fonte_titulo, center=True)
+        self.desenhar_texto("Pressione R para reiniciar", LARGURA / 2, ALTURA / 2, self.fonte_geral, center=True)
+
+    # <-- MUDANÇA: Método "roteador" de desenho
     def desenhar(self):
-        JANELA.fill(PRETO)
-
         if self.estado == MENU:
             self.desenhar_menu()
         elif self.estado == JOGANDO:
-            for plataforma in self.plataformas: plataforma.desenhar(JANELA)
-            for diamante in self.diamantes: diamante.desenhar(JANELA)
-            
-            todos_coletados = all(d.coletado for d in self.diamantes)
-            if todos_coletados: self.porta.desenhar(JANELA)
-
-            self.alavancas.draw(JANELA)
-            self.jogador1.desenhar(JANELA)
-            self.jogador2.desenhar(JANELA)
-            self.botao_movel.desenhar(JANELA)
-            self.plataforma_movel.desenhar(JANELA)
-            self.lago.desenhar(JANELA)
-            
-            # <-- MUDANÇA: Desenha a moldura PRIMEIRO
-            JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
-            # <-- MUDANÇA: Desenha o cronômetro DEPOIS, para que fique por cima
-            self.cronometro.desenhar(JANELA)
-            
-            total = len(self.diamantes)
-            coletados = sum(1 for d in self.diamantes if d.coletado)
-            # Usei a fonte_geral para o texto dos diamantes
-            self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 50, self.fonte_geral)
-
+            self.desenhar_jogo()
         elif self.estado == VITORIA:
-            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250, self.fonte_titulo)
-
+            self.desenhar_vitoria()
         pygame.display.flip()
 
-    def desenhar_texto(self, texto, x, y, fonte):
+    def desenhar_texto(self, texto, x, y, fonte, center=False):
         rotulo = fonte.render(texto, True, BRANCO)
-        JANELA.blit(rotulo, (x, y))
+        if center:
+            rect = rotulo.get_rect(center=(x, y))
+            JANELA.blit(rotulo, rect)
+        else:
+            JANELA.blit(rotulo, (x, y))
 
 if __name__ == "__main__":
     Jogo().executar()
