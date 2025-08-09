@@ -1,59 +1,69 @@
 import pygame
+from plataforma_movel import PlataformaMovel, Botao_Plataforma_Movel
+from foguinho import Foguinho
+from agua import Agua
+from diamante import DiamanteVermelho, DiamanteAzul
+from porta_final import Porta_final
 
-VERMELHO = (200, 50, 50)
-CINZA_ESCURO = (80, 80, 80)
-
-class Botao_Plataforma_Movel:
-    def __init__(self, x, y):
-        self.pressionado = False
-
-        self.imagem_levantado = pygame.image.load('Imagens/botao_roxo.png').convert_alpha()
-        self.imagem_abaixado = pygame.image.load('Imagens/botao_roxo.png').convert_alpha()  # Podem deixar só essa imagem pq eu fiz com que qnd o botão fosse acionado ela mudasse e parecesse pressionada
-
-        self.rect = self.imagem_levantado.get_rect(center=(x, y + 30))
-
-        # Hitbox fixa em 32x32, centralizada na imagem original
-        self.hitbox = pygame.Rect(0, 0, 32, 32)
-        self.hitbox.center = self.rect.center
-
-        self.y_original = self.rect.y
-
-    def verificar_ativacao(self, jogadores):
-        self.pressionado = False
-        for jogador in jogadores:
-            # Verifica se a parte inferior central do jogador está sobre a hitbox do botão
-            if self.hitbox.collidepoint(jogador.rect.centerx, jogador.rect.bottom):
-                self.pressionado = True
-                break
-
-    def desenhar(self, tela):
-        if self.pressionado:
-            self.rect.y = self.y_original + 4
-            # Criar uma cópia da imagem e aplicar um filtro para escurecer (exemplo simples)
-            imagem = self.imagem_levantado.copy()
-            imagem.fill((50, 50, 50, 100), special_flags=pygame.BLEND_RGBA_SUB)
-        else:
-            self.rect.y = self.y_original
-            imagem = self.imagem_levantado
-
-        self.hitbox.center = self.rect.center
-        tela.blit(imagem, self.rect)
-
-class PlataformaMovel:
-    """ Plataforma que se move entre duas posições dependendo do estado do botão """
-
-    def __init__(self, x, y, largura, altura, end, vel):
+class Plataforma:
+    def __init__(self, x, y, largura, altura):
         self.rect = pygame.Rect(x, y, largura, altura)
-        self.pos_inicial = x
-        self.pos_final = end
-        self.vel = vel
-        self.direcao = 1
-
-    def atualizar(self, ativado):
-        if ativado:
-            self.rect.x += self.vel * self.direcao
-            if self.rect.x <= min(self.pos_inicial, self.pos_final) or self.rect.x >= max(self.pos_inicial, self.pos_final):
-                self.direcao *= -1
-
     def desenhar(self, tela):
-        pygame.draw.rect(tela, (150, 0, 255), self.rect)
+        pygame.draw.rect(tela, (128, 128, 128), self.rect)
+
+class Lago:
+    def __init__(self, x, y, largura, altura, tipo):
+        self.rect = pygame.Rect(x, y, largura, altura)
+        self.tipo = tipo
+    def desenhar(self, tela):
+        cor = (173, 216, 230) if self.tipo == "agua" else (255, 100, 0)
+        pygame.draw.rect(tela, cor, self.rect)
+
+def criar_primeiro_nivel():
+    ALTURA = 600
+
+    plataformas = [
+        Plataforma(0, ALTURA - 40, 800, 40),
+        Plataforma(100, 480, 200, 20),
+        Plataforma(500, 480, 200, 20),
+        Plataforma(300, 380, 200, 20),
+        Plataforma(0, 280, 200, 20),
+        Plataforma(600, 280, 200, 20),
+    ]
+
+    botao_movel_1 = Botao_Plataforma_Movel(150, 460)
+    botao_movel_2 = Botao_Plataforma_Movel(550, 460)
+    plataforma_movel = PlataformaMovel(350, 430, 100, 20, end=200, vel=2)
+
+    lagos = [
+        Lago(300, ALTURA - 30, 80, 30, "agua"),
+        Lago(420, ALTURA - 30, 80, 30, "lava")
+    ]
+
+    # Portas iniciais estão trancadas; serão destrancadas quando diamantes forem coletados
+    porta_fogo = Porta_final((50, 200), "fogo", trancada=True)
+    porta_agua = Porta_final((700, 200), "agua", trancada=True)
+
+    jogador1 = Foguinho(100, ALTURA - 80, {"esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w})
+    jogador2 = Agua(200, ALTURA - 80, {"esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP})
+
+    diamantes = [
+        DiamanteVermelho(120, 250),
+        DiamanteAzul(660, 250),
+        DiamanteVermelho(320, 350),
+        DiamanteAzul(420, 350),
+    ]
+
+    # Retorna todos os objetos do nível para serem usados no main.py
+    return {
+        "jogador1": jogador1,
+        "jogador2": jogador2,
+        "plataformas": plataformas,
+        "botao_movel_1": botao_movel_1,
+        "botao_movel_2": botao_movel_2,
+        "plataforma_movel": plataforma_movel,
+        "lagos": lagos,
+        "porta_fogo": porta_fogo,
+        "porta_agua": porta_agua,
+        "diamantes": diamantes
+    }
