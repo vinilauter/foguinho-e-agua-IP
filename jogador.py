@@ -18,7 +18,6 @@ class Jogador(pygame.sprite.Sprite):
         self.vel_y_max = 10    # Velocidade máxima na queda
 
     def update(self, teclas):
-        """Atualiza o movimento horizontal e aplica o pulo."""
         self.vel_x = 0
 
         if teclas[self.controles["esquerda"]]:
@@ -30,32 +29,40 @@ class Jogador(pygame.sprite.Sprite):
             self.vel_y = self.forca_pulo
             self.pode_pular = False
 
-        self.rect.x += self.vel_x
-
     def aplicar_gravidade(self):
-        """Aplica gravidade ao jogador e atualiza sua posição vertical."""
+        """Atualiza velocidade vertical do jogador."""
         if self.vel_y < self.vel_y_max:
             self.vel_y += self.gravidade
-        self.rect.y += self.vel_y
+        # Não atualiza a posição aqui para evitar movimento duplo
 
     def checar_colisao(self, plataformas):
-        """
-        Verifica colisões verticais com plataformas e ajusta posição e estado de pulo.
-        Considera somente colisões na vertical (pulo/queda).
-        """
         self.pode_pular = False
 
+        # Movimento e colisão no eixo X
+        self.rect.x += self.vel_x
         for plataforma in plataformas:
-            if self.rect.colliderect(plataforma.rect):
-                if self.vel_y > 0 and self.rect.bottom <= plataforma.rect.bottom:
-                    # Colisão descendo (pouso)
-                    self.rect.bottom = plataforma.rect.top
+            # Verifica se 'plataforma' tem o atributo 'rect'; se não, assume que é pygame.Rect direto
+            rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
+            if self.rect.colliderect(rect_plataforma):
+                if self.vel_x > 0:
+                    self.rect.right = rect_plataforma.left
+                elif self.vel_x < 0:
+                    self.rect.left = rect_plataforma.right
+                self.vel_x = 0
+
+        # Movimento e colisão no eixo Y
+        self.rect.y += self.vel_y
+        for plataforma in plataformas:
+            rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
+            if self.rect.colliderect(rect_plataforma):
+                if self.vel_y > 0 and self.rect.bottom <= rect_plataforma.bottom:
+                    self.rect.bottom = rect_plataforma.top
                     self.vel_y = 0
                     self.pode_pular = True
                 elif self.vel_y < 0:
-                    # Colisão subindo (batida na cabeça)
-                    self.rect.top = plataforma.rect.bottom
+                    self.rect.top = rect_plataforma.bottom
                     self.vel_y = 0
+
 
     def desenhar(self, tela):
         """Desenha o jogador na tela."""
