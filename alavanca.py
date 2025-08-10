@@ -32,13 +32,10 @@ class Alavanca(pygame.sprite.Sprite):
     def check_colisao(self, jogador):
         if jogador.rect.colliderect(self.rect):
             tempo_atual = pygame.time.get_ticks()
-        
-        # Verifica se passou mais de 1 segundo (1000 milissegundos)
-
+            
+            # Verifica se passou mais de 1 segundo (1000 ms)
             if tempo_atual - self.ultimo_acionamento > 1000:
                 self.toggle()
-
                 self.ultimo_acionamento = tempo_atual
-            
                 return True
         return False
