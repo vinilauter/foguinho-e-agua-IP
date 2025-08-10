@@ -3,7 +3,7 @@ import sys
 from nivel import criar_primeiro_nivel
 from alavanca import Alavanca
 from cronometro import Cronometro
-from diamante import carregar_sprites_diamantes
+from diamante import carregar_sprites_diamantes, DiamanteAzul, DiamanteVermelho
 
 pygame.init()
 LARGURA, ALTURA = 1280, 720
@@ -49,6 +49,10 @@ class Jogo:
         self.background = pygame.image.load("Imagens/background.png").convert()
         self.background = pygame.transform.scale(self.background, (LARGURA, ALTURA))
         
+        # Imagem do menu
+        self.imagem_menu = pygame.image.load("Imagens/tela_inicial_jogo.png").convert_alpha()
+        self.imagem_menu = pygame.transform.scale(self.imagem_menu, (LARGURA, ALTURA))  # ajusta para a tela toda
+
         nivel = criar_primeiro_nivel()
 
         self.jogador1 = nivel["jogador1"]
@@ -89,25 +93,25 @@ class Jogo:
         self.jogador1.update(teclas)
         self.jogador2.update(teclas)
 
-        # Gravidade e colisão
+        # Aplicar gravidade e checar colisões (encapsulado para cada jogador)
         for jogador in [self.jogador1, self.jogador2]:
             jogador.aplicar_gravidade()
             jogador.checar_colisao(self.plataformas)
 
-        # Botões e plataforma móvel
-        self.botao_movel_1.verificar_ativacao([self.jogador1, self.jogador2])
-        self.botao_movel_2.verificar_ativacao([self.jogador1, self.jogador2])
+        # Atualizar ativação dos botões (assumindo que o método se chama atualizar e recebe lista de jogadores)
+        self.botao_movel_1.atualizar([self.jogador1, self.jogador2])
+        self.botao_movel_2.atualizar([self.jogador1, self.jogador2])
         ativado = self.botao_movel_1.pressionado or self.botao_movel_2.pressionado
         self.plataforma_movel.atualizar(ativado)
 
-        # Verifica se jogador caiu na água ou lava — reinicia o nível
+        # Reiniciar nível se jogador cair na água ou lava
         for jogador in [self.jogador1, self.jogador2]:
             for lago in self.lagos:
                 if jogador.rect.colliderect(lago.rect):
                     self.__init__()
                     return
 
-        # Checar coleta dos diamantes
+        # Checar coleta dos diamantes para cada jogador
         for diamante in self.diamantes:
             for jogador in [self.jogador1, self.jogador2]:
                 diamante.checar_coleta(jogador)
@@ -122,18 +126,21 @@ class Jogo:
             self.porta_fogo.destrancar(True)
             self.porta_agua.destrancar(True)
 
-        # Verifica se ambos jogadores estão na porta para vencer
+        # Verifica vitória (ambos jogadores na porta correta)
         if todos_coletados:
+            # Pode ajustar para permitir jogadores nas portas trocadas se quiser
             if self.jogador1.rect.colliderect(self.porta_fogo.rect) and self.jogador2.rect.colliderect(self.porta_agua.rect):
                 self.estado = VITORIA
 
     def desenhar_menu(self):
-        JANELA.fill(PRETO)
-        texto_titulo = self.fonte_titulo.render("Fogo & Água", True, BRANCO)
-        rect_titulo = texto_titulo.get_rect(center=(LARGURA / 2, ALTURA / 3))
+        JANELA.blit(self.imagem_menu, (0, 0))
+
+        # Retângulo semitransparente atrás do texto para destacar
+        s = pygame.Surface((LARGURA, 150), pygame.SRCALPHA)  # tamanho e alpha
+        s.fill((0, 0, 0, 150))  # preto com alpha 150 (0-255)
+        JANELA.blit(s, (0, ALTURA//3 - 50))
         texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA)
-        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2))
-        JANELA.blit(texto_titulo, rect_titulo)
+        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.))
         JANELA.blit(texto_instrucao, rect_instrucao)
 
     def desenhar(self):
@@ -144,19 +151,25 @@ class Jogo:
             self.desenhar_menu()
 
         elif self.estado == JOGANDO:
-            for plataforma in self.plataformas: plataforma.desenhar(JANELA)
-            for diamante in self.diamantes: diamante.desenhar(JANELA)
+            for plataforma in self.plataformas:
+                plataforma.desenhar(JANELA)
+            for diamante in self.diamantes:
+                diamante.desenhar(JANELA)
 
             # Desenha as portas sempre (imagem já muda conforme trancada/destrancada)
             self.porta_fogo.desenhar(JANELA)
             self.porta_agua.desenhar(JANELA)
 
             self.alavancas.draw(JANELA)
+            
+            # Desenha jogadores antes dos botões para que botões fiquem na frente
             self.jogador1.desenhar(JANELA)
             self.jogador2.desenhar(JANELA)
+
             self.botao_movel_1.desenhar(JANELA)
             self.botao_movel_2.desenhar(JANELA)
             self.plataforma_movel.desenhar(JANELA)
+
             for lago in self.lagos:
                 lago.desenhar(JANELA)
 
