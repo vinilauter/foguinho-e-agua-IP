@@ -39,18 +39,18 @@ def criar_primeiro_nivel():
         Plataforma(LARGURA - 20, 0, 20, ALTURA),
 
         # plataformas internas
-        Plataforma(100, 560, 200, 20),
-        Plataforma(500, 560, 200, 20),
-        Plataforma(300, 440, 200, 20),
-        Plataforma(800, 440, 200, 20),
-        Plataforma(100, 320, 200, 20),
-        Plataforma(600, 320, 200, 20),
-        Plataforma(400, 200, 200, 20),
+        Plataforma (20, 150, 216, 24),
+        Plataforma(100, 560, 216, 24),
+        Plataforma(500, 560, 216, 24),
+        Plataforma(300, 440, 216, 24),
+        Plataforma(800, 440, 216, 24),
+        Plataforma(20, 320, 1007, 24),
+        Plataforma(400, 200, 216, 24),
     ]
 
     botao_movel_1 = Botao(150, 460)
     botao_movel_2 = Botao(550, 460)
-    plataforma_movel = Plataforma_Movel(350, 430, 100, 20, 200, 2)
+    plataforma_movel = Plataforma_Movel(1007, 320, 100, 20, 200, 2)
 
     lagos = [
         Lago(300, ALTURA - 30, 160, 30, "agua"),
@@ -58,8 +58,8 @@ def criar_primeiro_nivel():
     ]
 
     altura_porta = 121 # TENTAR COLOCAR A PORTA EM CIMA DE ALGUMA PLATAFORMA
-    porta_agua = Porta_final((800, 440 - altura_porta), "agua", trancada=True)
-    porta_fogo = Porta_final((680, ALTURA - 40 - altura_porta), "fogo", trancada=True)
+    porta_agua = Porta_final((1200 , 812 - altura_porta), "agua", trancada=True)
+    porta_fogo = Porta_final((80, 160), "fogo", trancada=True)
 
     jogador1 = Agua(100, ALTURA - 80, {"esquerda": pygame.K_a, "direita": pygame.K_d, "pular": pygame.K_w})
     jogador2 = Foguinho(200, ALTURA - 80, {"esquerda": pygame.K_LEFT, "direita": pygame.K_RIGHT, "pular": pygame.K_UP})
