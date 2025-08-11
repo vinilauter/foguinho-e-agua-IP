@@ -60,16 +60,17 @@ class Jogo:
         self.porta_fogo = nivel["porta_fogo"]
         self.porta_agua = nivel["porta_agua"]
         self.diamantes = nivel["diamantes"]
+        
+        # CORRIGIDO: Armazena dinamicamente o número total de diamantes no início do nível
+        self.total_diamantes_nivel = len(self.diamantes)
 
         # Contadores de itens ativos
         self.botoes_ativos = 0
         self.alavancas_ativas = 0
         
-        # Rastreia o estado anterior para contar ativações/desativações
         self.botao_1_estava_pressionado = False
         self.botao_2_estava_pressionado = False
         
-        # Dicionário para rastrear o estado de cada alavanca
         try:
             self.estados_anteriores_alavancas = {alavanca: alavanca.ativada for alavanca in self.alavancas}
         except AttributeError:
@@ -114,57 +115,47 @@ class Jogo:
                     self.__init__()
                     return
 
-        # Atualização dos botões
         self.botao_movel_1.atualizar([self.jogador1, self.jogador2])
         self.botao_movel_2.atualizar([self.jogador1, self.jogador2])
         ativado = self.botao_movel_1.pressionado or self.botao_movel_2.pressionado
         self.plataforma_movel.atualizar(ativado)
 
-        # MODIFICADO: Lógica do contador de botões (incrementa e decrementa)
-        # Botão 1
         if self.botao_movel_1.pressionado and not self.botao_1_estava_pressionado:
-            self.botoes_ativos += 1  # Foi ativado
+            self.botoes_ativos += 1
         elif not self.botao_movel_1.pressionado and self.botao_1_estava_pressionado:
-            self.botoes_ativos -= 1  # Foi desativado
+            self.botoes_ativos -= 1
         self.botao_1_estava_pressionado = self.botao_movel_1.pressionado
         
-        # Botão 2
         if self.botao_movel_2.pressionado and not self.botao_2_estava_pressionado:
-            self.botoes_ativos += 1  # Foi ativado
+            self.botoes_ativos += 1
         elif not self.botao_movel_2.pressionado and self.botao_2_estava_pressionado:
-            self.botoes_ativos -= 1  # Foi desativado
+            self.botoes_ativos -= 1
         self.botao_2_estava_pressionado = self.botao_movel_2.pressionado
 
-        # Coleta de diamantes
         for jogador in [self.jogador1, self.jogador2]:
             for diamante in self.diamantes[:]:
                 if (jogador.tipo == "agua" and isinstance(diamante, DiamanteAzul) and jogador.rect.colliderect(diamante.rect)) or \
                    (jogador.tipo == "fogo" and isinstance(diamante, DiamanteVermelho) and jogador.rect.colliderect(diamante.rect)):
                     self.diamantes.remove(diamante)
 
-        # Atualização das alavancas
         self.alavancas.update()
         for jogador in [self.jogador1, self.jogador2]:
             for alavanca in self.alavancas:
                 alavanca.check_colisao(jogador)
         
-        # MODIFICADO: Lógica do contador de alavancas (incrementa e decrementa)
-        # Assumindo que a classe Alavanca tem um atributo booleano 'ativada'
         for alavanca in self.alavancas:
             estado_atual = alavanca.ativada
             estado_anterior = self.estados_anteriores_alavancas[alavanca]
             
             if estado_atual and not estado_anterior:
-                self.alavancas_ativas += 1  # Foi ativada
+                self.alavancas_ativas += 1
             elif not estado_atual and estado_anterior:
-                self.alavancas_ativas -= 1  # Foi desativada
+                self.alavancas_ativas -= 1
                 
             self.estados_anteriores_alavancas[alavanca] = estado_atual
 
-        # Atualização do cronômetro
         self.cronometro.update()
 
-        # Lógica de vitória
         todos_diamantes_coletados = not self.diamantes
         if todos_diamantes_coletados:
             jogadores = [self.jogador1, self.jogador2]
@@ -176,7 +167,8 @@ class Jogo:
             if jogador_agua.rect.colliderect(self.porta_agua.rect):
                 self.porta_agua.destrancar()
 
-            if not self.porta_fogo.trancada and not self.porta_agua.trancada:
+            if not self.porta_fogo.trancada and jogador_fogo.rect.colliderect(self.porta_fogo.rect) and \
+               not self.porta_agua.trancada and jogador_agua.rect.colliderect(self.porta_agua.rect):
                 self.estado = VITORIA
 
     def desenhar_menu(self):
@@ -208,18 +200,16 @@ class Jogo:
             self.botao_movel_1.desenhar(JANELA)
             self.botao_movel_2.desenhar(JANELA)
             self.plataforma_movel.desenhar(JANELA)
-
             for lago in self.lagos:
                 lago.desenhar(JANELA)
 
             JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
             self.cronometro.desenhar(JANELA)
             
-            total_inicial_diamantes = 8 
-            coletados = total_inicial_diamantes - len(self.diamantes)
-            self.desenhar_texto(f"Diamantes: {coletados}/{total_inicial_diamantes}", 10, 50, self.fonte_geral)
+            # CORRIGIDO: Usa a variável self.total_diamantes_nivel para o cálculo
+            coletados = self.total_diamantes_nivel - len(self.diamantes)
+            self.desenhar_texto(f"Diamantes: {coletados}/{self.total_diamantes_nivel}", 10, 50, self.fonte_geral)
 
-            # MODIFICADO: Exibe o número de itens ativos
             self.desenhar_texto(f"Botões Ativos: {self.botoes_ativos}", 10, 80, self.fonte_geral)
             self.desenhar_texto(f"Alavancas Ativas: {self.alavancas_ativas}", 10, 110, self.fonte_geral)
 
