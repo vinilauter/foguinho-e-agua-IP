@@ -15,7 +15,6 @@ FPS = 60
 BRANCO = (255, 255, 255)
 CINZA = (128, 128, 128)
 PRETO = (0, 0, 0)
-AMARELO = (255, 255, 0)
 
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
@@ -30,7 +29,7 @@ class Jogo:
         self.fonte_geral = pygame.font.Font(None, 36)
         self.fonte_titulo = pygame.font.Font(None, 74)
         self.estado = MENU
-        self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=AMARELO)
+        self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
 
         # Moldura do timer
         self.moldura_timer_img = pygame.image.load("Imagens/moldura_timer.png").convert_alpha()
@@ -170,7 +169,7 @@ class Jogo:
         s.fill((0, 0, 0, 150))  # preto com alpha 150 (0-255)
         JANELA.blit(s, (0, ALTURA//3 - 50))
         texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA)
-        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.75))
+        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.))
         JANELA.blit(texto_instrucao, rect_instrucao)
 
     def desenhar(self):
@@ -212,7 +211,7 @@ class Jogo:
             self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
-            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 100, 200, self.fonte_titulo)
+            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250, self.fonte_titulo)
 
         pygame.display.flip()
 
