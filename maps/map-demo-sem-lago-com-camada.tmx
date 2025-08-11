@@ -9,15 +9,15 @@
  <tileset firstgid="129" source="../imgs/texturas.tsx"/>
  <objectgroup id="6" name="objetivos">
   <properties>
-   <property name="botao_roxo" value=""/>
-   <property name="diamante-azul" value=""/>
-   <property name="diamante-vermelho" value=""/>
-   <property name="lago_azul" value=""/>
-   <property name="lago_verde" value=""/>
-   <property name="lago_vermelho" value=""/>
-   <property name="plataforma_roxa" value=""/>
-   <property name="porta_azul" value=""/>
-   <property name="porta_vermelha" value=""/>
+   <property name="botao_roxo" value="roxa"/>
+   <property name="diamante-azul" value="azul"/>
+   <property name="diamante-vermelho" value="vermelho"/>
+   <property name="lago_azul" value="azul"/>
+   <property name="lago_verde" value="verde"/>
+   <property name="lago_vermelho" value="vermelho"/>
+   <property name="plataforma_roxa" value="roxa"/>
+   <property name="porta_azul" value="azul"/>
+   <property name="porta_vermelha" value="vermelho"/>
   </properties>
   <object id="22" x="156.037" y="247.678" width="133.746" height="29.7214"/>
   <object id="23" x="771.517" y="149.845" width="141.176" height="33.4365"/>

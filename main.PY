@@ -144,7 +144,7 @@ class Jogo:
         # --- CAMINHO DO SEU ARQUIVO TMX ---
         # Certifique-se de que este caminho está correto para o seu arquivo .tmx!
         # Agora o mapa está em 'assets/maps/'
-        MAPA_DO_NIVEL = "assets/maps/map-demo-sem-lago-com-camada.tmx" 
+        MAPA_DO_NIVEL = "maps/map-demo-sem-lago-com-camada.tmx" 
 
         self.nivel_atual = Nivel1(LARGURA, ALTURA, MAPA_DO_NIVEL) 
 
