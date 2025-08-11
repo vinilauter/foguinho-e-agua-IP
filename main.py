@@ -107,14 +107,18 @@ class Jogo:
         # Reiniciar nível se jogador cair na água ou lava
         for jogador in [self.jogador1, self.jogador2]:
             for lago in self.lagos:
-                if jogador.rect.colliderect(lago.rect):
-                    self.__init__()
-                    return
+                if jogador.rect.colliderect(lago.rect): # Só reinicia se Fogo cair na Àgua e vice-versa
+                    if (jogador.tipo == "fogo" and lago.tipo == "agua") or (jogador.tipo == "agua" and lago.tipo == "lava"):
+                        self.__init__()
+                        return
 
         # Checar coleta dos diamantes para cada jogador
-        for diamante in self.diamantes:
-            for jogador in [self.jogador1, self.jogador2]:
-                diamante.checar_coleta(jogador)
+        for jogador in [self.jogador1, self.jogador2]:
+            for diamante in self.diamantes[:]:
+                if jogador.tipo == "agua" and isinstance(diamante, DiamanteAzul) and jogador.rect.colliderect(diamante.rect):
+                    self.diamantes.remove(diamante)
+                elif jogador.tipo == "fogo" and isinstance(diamante, DiamanteVermelho) and jogador.rect.colliderect(diamante.rect):
+                    self.diamantes.remove(diamante)
 
         # Atualiza cronômetro e alavancas
         self.alavancas.update()

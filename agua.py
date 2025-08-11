@@ -8,3 +8,4 @@ class Agua(Jogador):
         self.image = pygame.image.load("Imagens/watergirl.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (80, 70))
         self.rect = self.image.get_rect(topleft=(pos_x, pos_y))
+        self.tipo = "agua"

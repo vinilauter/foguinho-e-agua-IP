@@ -13,7 +13,7 @@ class Jogador(pygame.sprite.Sprite):
         self.vel_y = 0
         self.pode_pular = False
 
-        self.forca_pulo = -10  # Força inicial do pulo (negativa para subir)
+        self.forca_pulo = -15  # Força inicial do pulo (negativa para subir)
         self.gravidade = 0.5   # Aceleração da gravidade (queda)
         self.vel_y_max = 10    # Velocidade máxima na queda
 
