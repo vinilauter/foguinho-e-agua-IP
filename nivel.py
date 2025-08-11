@@ -54,7 +54,7 @@ def criar_primeiro_nivel():
 
     lagos = [
         Lago(300, ALTURA - 30, 160, 30, "agua"),
-        Lago(520, ALTURA - 30, 160, 30, "lava")
+        Lago(520, ALTURA - 30, 160, 30, "fogo") # Fogo no lugar de lava para padronizar
     ]
 
     altura_porta = 121 # TENTAR COLOCAR A PORTA EM CIMA DE ALGUMA PLATAFORMA

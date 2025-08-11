@@ -96,7 +96,21 @@ class Jogo:
         # Aplicar gravidade e checar colisões (encapsulado para cada jogador)
         for jogador in [self.jogador1, self.jogador2]:
             jogador.aplicar_gravidade()
-            jogador.checar_colisao(self.plataformas)
+        
+            # lagos sólidos para jogador de mesmo tipo do lago
+            lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
+        
+            # passa plataformas + lagos sólidos para colisão
+            jogador.checar_colisao(self.plataformas + lagos_solidos)
+        
+        # depois, verifica se jogador colidiu com lago que não é dele — para matar
+        for jogador in [self.jogador1, self.jogador2]:
+            for lago in self.lagos:
+                if jogador.rect.colliderect(lago.rect):
+                    if lago.tipo != jogador.tipo:
+                        # jogador caiu no lago errado → reinicia jogo
+                        self.__init__()
+                        return
 
         # Atualizar ativação dos botões (assumindo que o método se chama atualizar e recebe lista de jogadores)
         self.botao_movel_1.atualizar([self.jogador1, self.jogador2])
