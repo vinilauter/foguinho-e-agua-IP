@@ -1,2 +1,9 @@
-Faltam as imagens dos botões, personagens, background e utilidade para as alavancas, bem como a possibilidade do personagem poder ficar sobre a plataforma móvel (atualmente ele apenas a atravessa). E o desenho do nível.
-Os personagens não capturam os diamantes, sejam eles de cores quaisquer.
+Falta utilidade para as alavancas.
+
+As alavancas agora não são mais ativadas (?)
+
+Falta posicionar as alavancas, portas e botões em cima das plataformas.
+
+Os botões não acionam mais a plataforma móvel (?)
+
+O contador de diamantes agora conta de forma regressiva (?)
