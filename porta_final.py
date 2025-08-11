@@ -16,8 +16,8 @@ class Porta_final(pygame.sprite.Sprite):
         self.image = self.image_trancada if trancada else self.image_destrancada
         self.rect = self.image.get_rect(midbottom=posicao)
 
-    def destrancar(self, diamantes_coletados):
-        if diamantes_coletados and self.trancada:
+    def destrancar(self):
+        if self.trancada:
             self.trancada = False
             self.image = self.image_destrancada
             self.rect = self.image.get_rect(midbottom=self.posicao)  # Atualiza o retângulo

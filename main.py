@@ -137,17 +137,28 @@ class Jogo:
         # Atualiza cronômetro e alavancas
         self.alavancas.update()
         self.cronometro.update()
+        for jogador in [self.jogador1, self.jogador2]:
+            for alavanca in self.alavancas:
+                alavanca.check_colisao(jogador)
 
         # Destrancar portas se todos os diamantes coletados
         todos_coletados = all(d.coletado for d in self.diamantes)
-        if todos_coletados:
-            self.porta_fogo.destrancar(True)
-            self.porta_agua.destrancar(True)
 
-        # Verifica vitória (ambos jogadores na porta correta)
+        # Define jogadores por tipo
+        jogadores = [self.jogador1, self.jogador2]
+        jogador_fogo = next(j for j in jogadores if j.tipo == "fogo")
+        jogador_agua = next(j for j in jogadores if j.tipo == "agua")
+
+        # Destranca portas apenas quando jogador certo encostar, e todos os diamantes forem coletados
         if todos_coletados:
-            # Pode ajustar para permitir jogadores nas portas trocadas se quiser
-            if self.jogador1.rect.colliderect(self.porta_fogo.rect) and self.jogador2.rect.colliderect(self.porta_agua.rect):
+            if jogador_fogo.rect.colliderect(self.porta_fogo.rect):
+                self.porta_fogo.destrancar()
+            if jogador_agua.rect.colliderect(self.porta_agua.rect):
+                self.porta_agua.destrancar()
+
+            # Verifica vitória: ambos jogadores nas portas destrancadas
+            if (not self.porta_fogo.trancada and jogador_fogo.rect.colliderect(self.porta_fogo.rect) and
+                not self.porta_agua.trancada and jogador_agua.rect.colliderect(self.porta_agua.rect)):
                 self.estado = VITORIA
 
     def desenhar_menu(self):
