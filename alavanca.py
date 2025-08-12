@@ -22,6 +22,15 @@ class Alavanca(pygame.sprite.Sprite):
 
         self.ultimo_acionamento = 0
 
+    # Calcula a largura de cada metade da hitbox
+        metade_largura = self.rect.width / 2
+
+    # Cria o retângulo para a metade esquerda (agora para DESATIVAR)
+        self.rect_desativar = pygame.Rect(self.rect.left, self.rect.top, metade_largura, self.rect.height)
+
+    # Cria o retângulo para a metade direita (agora para ATIVAR)
+        self.rect_ativar = pygame.Rect(self.rect.centerx, self.rect.top, metade_largura, self.rect.height)           
+
     def update(self):
         if self.ativada:
             self.image = self.img_ligada
@@ -31,14 +40,24 @@ class Alavanca(pygame.sprite.Sprite):
     def toggle(self):
         self.ativada = not self.ativada
         self.update()
-    
+
     def check_colisao(self, jogador):
-        if jogador.rect.colliderect(self.rect):
-            tempo_atual = pygame.time.get_ticks()
-            
-            # Verifica se passou mais de 1 segundo (1000 ms)
-            if tempo_atual - self.ultimo_acionamento > 1000:
-                self.toggle()
-                self.ultimo_acionamento = tempo_atual
+        tempo_atual = pygame.time.get_ticks()
+
+        # A alavanca só pode ser alterada se o cooldown tiver passado
+        if tempo_atual - self.ultimo_acionamento > 1000: # 1 segundo de cooldown
+
+            # Lógica para ATIVAR a alavanca (se estiver desativada e o jogador tocar no lado esquerdo)
+            if not self.ativada and jogador.rect.colliderect(self.rect_ativar):
+                self.toggle() # Liga a alavanca
+                self.ultimo_acionamento = tempo_atual # Reinicia o cooldown
                 return True
+
+            # Lógica para DESATIVAR a alavanca (se estiver ativada e o jogador tocar no lado direito)
+            elif self.ativada and jogador.rect.colliderect(self.rect_desativar):
+                self.toggle() # Desliga a alavanca
+                self.ultimo_acionamento = tempo_atual # Reinicia o cooldown
+                return True
+
+        # Se nenhuma das condições for atendida (ou o cooldown não passou), ent não faz nada
         return False
