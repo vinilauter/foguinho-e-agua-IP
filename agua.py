@@ -9,3 +9,7 @@ class Agua(Jogador):
         self.image = pygame.transform.scale(self.image, (80, 70))
         self.rect = self.image.get_rect(topleft=(pos_x, pos_y))
         self.tipo = "agua"
+        largura_hitbox = 20
+        altura_hitbox = 65
+        self.hitbox = pygame.Rect(0, 0, largura_hitbox, altura_hitbox)
+        self.hitbox.center = self.rect.center
