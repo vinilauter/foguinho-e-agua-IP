@@ -65,8 +65,10 @@ class Plataforma_Movel :
         caminho_desativada = os.path.join('Imagens/plataforma_movel_horizontal_desativada.png')
         self.imagem_ativada = pygame.image.load(caminho_ativada).convert_alpha()
         self.imagem_desativada = pygame.image.load(caminho_desativada).convert_alpha()
-        self.imagem_ativada = pygame.transform.scale(self.imagem_ativada, (largura, altura))
-        self.imagem_desativada = pygame.transform.scale(self.imagem_desativada, (largura, altura))
+        
+        self.imagem_ativada = pygame.transform.scale(self.imagem_ativada, ((largura * 3) // 5, (altura * 3) // 5))
+        self.imagem_desativada = pygame.transform.scale(self.imagem_desativada, ((largura * 3) // 5, (altura * 3) // 5))
+        
         self.imagem_atual = self.imagem_desativada
 
         self.rect = self.imagem_atual.get_rect(topleft=(x, y))
