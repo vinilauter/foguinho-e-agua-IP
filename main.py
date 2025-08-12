@@ -181,7 +181,7 @@ class Jogo:
         s.fill((0, 0, 0, 150))
         JANELA.blit(s, (0, ALTURA//3 - 50))
         texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA)
-        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.))
+        rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.75))
         JANELA.blit(texto_instrucao, rect_instrucao)
 
     def desenhar(self):
@@ -228,7 +228,7 @@ class Jogo:
             self.desenhar_texto(f"Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
-            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250, self.fonte_titulo)
+            self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 100, 200, self.fonte_titulo)
 
         
         pygame.display.flip()
