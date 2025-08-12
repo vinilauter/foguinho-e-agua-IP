@@ -103,7 +103,7 @@ class Jogo:
             lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
         
             # passa plataformas + lagos sólidos para colisão
-            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + self.plataformas_moveis_alavanca + lagos_solidos)
+            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + list(self.plataformas_moveis_alavanca) + lagos_solidos)
         
         # depois, verifica se jogador colidiu com lago que não é dele — para matar
         for jogador in [self.jogador1, self.jogador2]:
@@ -131,7 +131,7 @@ class Jogo:
         for jogador in [self.jogador1, self.jogador2]:
             for lago in self.lagos:
                 if jogador.rect.colliderect(lago.rect): # Só reinicia se Fogo cair na Àgua e vice-versa
-                    if (jogador.tipo == "fogo" and lago.tipo == "agua") or (jogador.tipo == "agua" and lago.tipo == "lava"):
+                    if (jogador.tipo == "fogo" and lago.tipo == "agua") or (jogador.tipo == "agua" and lago.tipo == "fogo"):
                         self.__init__()
                         return
 
@@ -154,31 +154,31 @@ class Jogo:
         self.plataformas_verticais.update()
 
         # Destrancar portas se todos os diamantes coletados
-        todos_coletados = all(d.coletado for d in self.diamantes)
+        todos_coletados = not self.diamantes
 
         # Define jogadores por tipo
         jogadores = [self.jogador1, self.jogador2]
-        jogador_fogo = next(j for j in jogadores if j.tipo == "fogo")
-        jogador_agua = next(j for j in jogadores if j.tipo == "agua")
+        jogador_fogo = next((j for j in jogadores if j.tipo == "fogo"), None)
+        jogador_agua = next((j for j in jogadores if j.tipo == "agua"), None)
 
         # Destranca portas apenas quando jogador certo encostar, e todos os diamantes forem coletados
         if todos_coletados:
-            if jogador_fogo.rect.colliderect(self.porta_fogo.rect):
+            if jogador_fogo and jogador_fogo.rect.colliderect(self.porta_fogo.rect):
                 self.porta_fogo.destrancar()
-            if jogador_agua.rect.colliderect(self.porta_agua.rect):
+            if jogador_agua and jogador_agua.rect.colliderect(self.porta_agua.rect):
                 self.porta_agua.destrancar()
 
             # Verifica vitória: ambos jogadores nas portas destrancadas
-            if (not self.porta_fogo.trancada and jogador_fogo.rect.colliderect(self.porta_fogo.rect) and
-                not self.porta_agua.trancada and jogador_agua.rect.colliderect(self.porta_agua.rect)):
+            if (jogador_fogo and not self.porta_fogo.trancada and jogador_fogo.rect.colliderect(self.porta_fogo.rect) and
+                jogador_agua and not self.porta_agua.trancada and jogador_agua.rect.colliderect(self.porta_agua.rect)):
                 self.estado = VITORIA
 
     def desenhar_menu(self):
         JANELA.blit(self.imagem_menu, (0, 0))
 
         # Retângulo semitransparente atrás do texto para destacar
-        s = pygame.Surface((LARGURA, 150), pygame.SRCALPHA)  # tamanho e alpha
-        s.fill((0, 0, 0, 150))  # preto com alpha 150 (0-255)
+        s = pygame.Surface((LARGURA, 150), pygame.SRCALPHA)
+        s.fill((0, 0, 0, 150))
         JANELA.blit(s, (0, ALTURA//3 - 50))
         texto_instrucao = self.fonte_geral.render("Pressione ESPAÇO para começar", True, CINZA)
         rect_instrucao = texto_instrucao.get_rect(center=(LARGURA / 2, ALTURA / 2.))
@@ -222,18 +222,25 @@ class Jogo:
             JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
             self.cronometro.desenhar(JANELA)
 
-            total = len(self.diamantes)
-            coletados = sum(1 for d in self.diamantes if d.coletado)
-            self.desenhar_texto(f"Diamantes: {coletados}/{total}", 10, 50, self.fonte_geral)
+            # Lógica original de contagem de diamantes
+            total_diamantes = 3 # Defina o total de diamantes do seu nível
+            coletados = total_diamantes - len(self.diamantes)
+            self.desenhar_texto(f"Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
             self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 180, 250, self.fonte_titulo)
 
+        
         pygame.display.flip()
 
     def desenhar_texto(self, texto, x, y, fonte):
         rotulo = fonte.render(texto, True, BRANCO)
         JANELA.blit(rotulo, (x, y))
 
+def main():
+    carregar_sprites_diamantes()
+    jogo = Jogo()
+    jogo.executar()
+
 if __name__ == "__main__":
-    Jogo().executar()
+    main()
