@@ -58,29 +58,35 @@ class Plataforma_Movel :
         self.y_inicial = y
         self.y_final = y_final
         self.velocidade_vertical = velocidade
-        self.movendo = False 
+        self.movendo = False
+        self.velocidade_y = 0
 
         caminho_ativada = os.path.join('Imagens/plataforma_movel_horizontal_ativada.png')
         caminho_desativada = os.path.join('Imagens/plataforma_movel_horizontal_desativada.png')
         self.imagem_ativada = pygame.image.load(caminho_ativada).convert_alpha()
         self.imagem_desativada = pygame.image.load(caminho_desativada).convert_alpha()
-        self.imagem_ativada = pygame.transform.scale(self.imagem_ativada, (largura, altura))
-        self.imagem_desativada = pygame.transform.scale(self.imagem_desativada, (largura, altura))
+        
+        self.imagem_ativada = pygame.transform.scale(self.imagem_ativada, ((largura * 3) // 5, (altura * 3) // 5))
+        self.imagem_desativada = pygame.transform.scale(self.imagem_desativada, ((largura * 3) // 5, (altura * 3) // 5))
+        
         self.imagem_atual = self.imagem_desativada
 
         self.rect = self.imagem_atual.get_rect(topleft=(x, y))
 
     def atualizar(self, ativado) :
         self.movendo = False
+        self.velocidade_y = 0
         if ativado :
             if self.rect.y < self.y_final :
                 movimento = min(self.velocidade_vertical, self.y_final - self.rect.y)
                 self.rect.y += movimento
+                self.velocidade_y = movimento
                 self.movendo = True
         else :
             if self.rect.y > self.y_inicial :
                 movimento = min(self.velocidade_vertical, self.rect.y - self.y_inicial)
                 self.rect.y -= movimento
+                self.velocidade_y = -movimento
                 self.movendo = True
 
         if self.movendo or self.rect.y == self.y_final :

@@ -11,6 +11,9 @@ class Alavanca(pygame.sprite.Sprite):
         self.img_ligada = pygame.image.load(caminho_ligada).convert_alpha()
         self.img_desligada = pygame.image.load(caminho_desligada).convert_alpha()
 
+        self.img_ligada = pygame.transform.scale(self.img_ligada, (self.img_ligada.get_width() // 2, self.img_ligada.get_height() // 2))
+        self.img_desligada = pygame.transform.scale(self.img_desligada, (self.img_desligada.get_width() // 2, self.img_desligada.get_height() // 2))
+
         self.image = self.img_desligada
         self.rect = self.img_desligada.get_rect(midbottom=posicao)
         
