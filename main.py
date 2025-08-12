@@ -65,6 +65,8 @@ class Jogo:
         self.alavancas = pygame.sprite.Group()
         for alavanca in nivel["alavancas"]:
             self.alavancas.add(alavanca)
+        self.plataformas_verticais = pygame.sprite.Group(nivel["plataformas_verticais"])
+        self.plataformas_moveis_alavanca = nivel["plataformas_moveis_alavanca"]
 
     def executar(self):
         while True:
@@ -101,7 +103,7 @@ class Jogo:
             lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
         
             # passa plataformas + lagos sólidos para colisão
-            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + lagos_solidos)
+            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + self.plataformas_moveis_alavanca + lagos_solidos)
         
         # depois, verifica se jogador colidiu com lago que não é dele — para matar
         for jogador in [self.jogador1, self.jogador2]:
@@ -147,6 +149,9 @@ class Jogo:
         for jogador in [self.jogador1, self.jogador2]:
             for alavanca in self.alavancas:
                 alavanca.check_colisao(jogador)
+        for plataforma in self.plataformas_moveis_alavanca:
+            plataforma.update()
+        self.plataformas_verticais.update()
 
         # Destrancar portas se todos os diamantes coletados
         todos_coletados = all(d.coletado for d in self.diamantes)
@@ -188,6 +193,10 @@ class Jogo:
 
         elif self.estado == JOGANDO:
             for plataforma in self.plataformas:
+                plataforma.desenhar(JANELA)
+            for plataforma in self.plataformas_moveis_alavanca:
+                JANELA.blit(plataforma.image, plataforma.rect)
+            for plataforma in self.plataformas_verticais:
                 plataforma.desenhar(JANELA)
             for diamante in self.diamantes:
                 diamante.desenhar(JANELA)

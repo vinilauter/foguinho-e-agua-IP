@@ -4,7 +4,9 @@ from foguinho import Foguinho
 from agua import Agua
 from diamante import DiamanteVermelho, DiamanteAzul
 from porta_final import Porta_final
+from plataforma_vertical_alavanca import Plataforma_movel_vertical
 from alavanca import Alavanca
+from plataforma_vertical_alavanca import Plataforma_movel_vertical
 
 class Plataforma:
     def __init__(self, x, y, largura, altura):
@@ -72,9 +74,24 @@ def criar_primeiro_nivel():
         DiamanteAzul(420, 720 - 60),
     ]
 
-    alavancas = [
-        Alavanca((500, 344), "branca"),
-        Alavanca((600, 584), "azul"),
+    alavanca1 = Alavanca((500, 344), "verde")
+    alavanca2 = Alavanca((600, 584), "azul")
+
+    alavancas = [alavanca1, alavanca2]
+
+    plataformas_verticais = [
+        Plataforma_movel_vertical(
+            posicao_inicial=(1000, 50),
+            posicao_final=(1000, 500),
+            alavanca_designada=alavanca2,
+            cor="azul"
+        ),
+        Plataforma_movel_vertical(
+            posicao_inicial=(150, 150),
+            posicao_final=(150, 500),
+            alavanca_designada=alavanca1,
+            cor="verde"
+        )
     ]
 
     return {
@@ -88,5 +105,7 @@ def criar_primeiro_nivel():
         "porta_fogo": porta_fogo,
         "porta_agua": porta_agua,
         "diamantes": diamantes,
-        "alavancas": alavancas
+        "alavancas": alavancas,
+        "plataformas_verticais": plataformas_verticais,
+        "plataformas_moveis_alavanca": plataformas_verticais
     }
