@@ -5,6 +5,9 @@ class Plataforma_movel_vertical(pygame.sprite.Sprite):
         super().__init__()
         caminho_imagem = f"Imagens/plataforma_movel_vertical_{cor}.png"
         self.image = pygame.image.load(caminho_imagem).convert_alpha()
+
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() *3// 5, self.image.get_height() *3// 5))
+
         self.rect = self.image.get_rect()
         
         # Guarda posições Y como números (e X também pra manter fixo)
