@@ -22,9 +22,6 @@ class Jogo:
     def __init__(self):
         carregar_sprites_diamantes()  # Não esqueça de chamar essa função antes de criar os diamantes!
 
-        self.alavancas = pygame.sprite.Group()
-        self.alavancas.add(Alavanca((400, 430), "branca"), Alavanca((600, 170), "azul"))
-        
         self.relogio = pygame.time.Clock()
         self.fonte_geral = pygame.font.Font(None, 36)
         self.fonte_titulo = pygame.font.Font(None, 74)
@@ -65,6 +62,9 @@ class Jogo:
         self.porta_fogo = nivel["porta_fogo"]
         self.porta_agua = nivel["porta_agua"]
         self.diamantes = nivel["diamantes"]
+        self.alavancas = pygame.sprite.Group()
+        for alavanca in nivel["alavancas"]:
+            self.alavancas.add(alavanca)
 
     def executar(self):
         while True:
@@ -101,7 +101,7 @@ class Jogo:
             lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
         
             # passa plataformas + lagos sólidos para colisão
-            jogador.checar_colisao(self.plataformas + lagos_solidos)
+            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + lagos_solidos)
         
         # depois, verifica se jogador colidiu com lago que não é dele — para matar
         for jogador in [self.jogador1, self.jogador2]:
@@ -117,6 +117,13 @@ class Jogo:
         self.botao_movel_2.atualizar([self.jogador1, self.jogador2])
         ativado = self.botao_movel_1.pressionado or self.botao_movel_2.pressionado
         self.plataforma_movel.atualizar(ativado)
+
+        # Mover jogadores junto com a plataforma se estiverem em cima dela
+        for jogador in [self.jogador1, self.jogador2]:
+            if jogador.rect.colliderect(self.plataforma_movel.rect):
+                # Checa se está em cima da plataforma (não do lado ou dentro)
+                if abs(jogador.rect.bottom - self.plataforma_movel.rect.top) <= 5:
+                    jogador.rect.y += self.plataforma_movel.velocidade_y
 
         # Reiniciar nível se jogador cair na água ou lava
         for jogador in [self.jogador1, self.jogador2]:

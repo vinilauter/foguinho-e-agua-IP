@@ -4,6 +4,7 @@ from foguinho import Foguinho
 from agua import Agua
 from diamante import DiamanteVermelho, DiamanteAzul
 from porta_final import Porta_final
+from alavanca import Alavanca
 
 class Plataforma:
     def __init__(self, x, y, largura, altura):
@@ -48,9 +49,9 @@ def criar_primeiro_nivel():
         Plataforma(400, 200, 216, 24),
     ]
 
-    botao_movel_1 = Botao(150, 460)
-    botao_movel_2 = Botao(550, 460)
-    plataforma_movel = Plataforma_Movel(1007, 320, 100, 20, 200, 2)
+    botao_movel_1 = Botao(330, 440 - 12)
+    botao_movel_2 = Botao(800, ALTURA - 40 - 12)
+    plataforma_movel = Plataforma_Movel(1126, 200, 100, 20, 520, 2)
 
     lagos = [
         Lago(300, ALTURA - 30, 160, 30, "agua"),
@@ -67,8 +68,13 @@ def criar_primeiro_nivel():
     diamantes = [
         DiamanteVermelho(120, 250),
         DiamanteAzul(660, 250),
-        DiamanteVermelho(320, 350),
-        DiamanteAzul(420, 350),
+        DiamanteVermelho(660, 450),
+        DiamanteAzul(420, 720 - 60),
+    ]
+
+    alavancas = [
+        Alavanca((500, 344), "branca"),
+        Alavanca((600, 584), "azul"),
     ]
 
     return {
@@ -81,5 +87,6 @@ def criar_primeiro_nivel():
         "lagos": lagos,
         "porta_fogo": porta_fogo,
         "porta_agua": porta_agua,
-        "diamantes": diamantes
+        "diamantes": diamantes,
+        "alavancas": alavancas
     }
