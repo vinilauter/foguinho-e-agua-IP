@@ -223,9 +223,9 @@ class Jogo:
             self.cronometro.desenhar(JANELA)
 
             # Lógica original de contagem de diamantes
-            total_diamantes = 3 # Defina o total de diamantes do seu nível
+            total_diamantes = 4 # Defina o total de diamantes do seu nível
             coletados = total_diamantes - len(self.diamantes)
-            self.desenhar_texto(f"Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
+            self.desenhar_texto(f"    Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
             self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 100, 200, self.fonte_titulo)
