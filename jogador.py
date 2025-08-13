@@ -13,35 +13,47 @@ class Jogador(pygame.sprite.Sprite):
         self.vel_y = 0
         self.pode_pular = False
 
-        self.forca_pulo = -12.5  # Força inicial do pulo (negativa para subir)
-        self.gravidade = 0.5   # Aceleração da gravidade (queda)
-        self.vel_y_max = 10    # Velocidade máxima na queda
+        self.forca_pulo = -12.5
+        self.gravidade = 0.5
+        self.vel_y_max = 10
+
+        self.velocidade_normal = 4
+        self.velocidade_atual = self.velocidade_normal
+        self.powerup_ativo = False
+        self.tempo_fim_powerup = 0
 
     def update(self, teclas):
-        self.vel_x = 0
+        if self.powerup_ativo and pygame.time.get_ticks() > self.tempo_fim_powerup:
+            self.desativar_powerup_velocidade()
 
+        self.vel_x = 0
         if teclas[self.controles["esquerda"]]:
-            self.vel_x = -4
+            self.vel_x = -self.velocidade_atual
         if teclas[self.controles["direita"]]:
-            self.vel_x = 4
+            self.vel_x = self.velocidade_atual
 
         if teclas[self.controles["pular"]] and self.pode_pular:
             self.vel_y = self.forca_pulo
             self.pode_pular = False
 
+    def ativar_powerup_velocidade(self, duracao_ms):
+        self.powerup_ativo = True
+        self.velocidade_atual = self.velocidade_normal * 1.75
+        self.tempo_fim_powerup = pygame.time.get_ticks() + duracao_ms
+
+    def desativar_powerup_velocidade(self):
+        self.powerup_ativo = False
+        self.velocidade_atual = self.velocidade_normal
+
     def aplicar_gravidade(self):
-        """Atualiza velocidade vertical do jogador."""
         if self.vel_y < self.vel_y_max:
             self.vel_y += self.gravidade
-        # Não atualiza a posição aqui para evitar movimento duplo
 
     def checar_colisao(self, plataformas):
         self.pode_pular = False
 
-        # Movimento e colisão no eixo X
         self.rect.x += self.vel_x
         for plataforma in plataformas:
-            # Verifica se 'plataforma' tem o atributo 'rect'; se não, assume que é pygame.Rect direto
             rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
             if self.rect.colliderect(rect_plataforma):
                 if self.vel_x > 0:
@@ -50,7 +62,6 @@ class Jogador(pygame.sprite.Sprite):
                     self.rect.left = rect_plataforma.right
                 self.vel_x = 0
 
-        # Movimento e colisão no eixo Y
         self.rect.y += self.vel_y
         for plataforma in plataformas:
             rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
@@ -63,7 +74,5 @@ class Jogador(pygame.sprite.Sprite):
                     self.rect.top = rect_plataforma.bottom
                     self.vel_y = 0
 
-
     def desenhar(self, tela):
-        """Desenha o jogador na tela."""
         tela.blit(self.image, self.rect)
