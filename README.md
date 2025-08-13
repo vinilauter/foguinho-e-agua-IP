@@ -52,4 +52,12 @@ No dia 6 de agosto foi feito um checkpoint presencial com a professora Fernanda 
 
 ## Dia 8 - terceiro checkpoint (08/08/2025)
 
-No dia 8 de agosto foi feito um checkpoint presencial com os monitores designados, atualizando-os das novas features em estágio de implementação e a explicação de como está sendo a estruturação do repositório em arquivos separados, no mais a maioria das features já foi esboçada e a equipe logo iniciará uma fase de integração e alinhamento para a inclusão correta de cada funcionalidade na main.
+No dia 8 de agosto foi feito um checkpoint com os monitores designados, atualizando-os das novas features em estágio de implementação e a explicação de como está sendo a estruturação do repositório em arquivos separados, no mais a maioria das features já foi esboçada e a equipe logo iniciará uma fase de integração e alinhamento para a inclusão correta de cada funcionalidade na main.
+
+## Dia 11 - quarto checkpoint (11/08/2025) 
+
+No dia 11 de agosto foi feito um checkpoint presencial com a professora Fernanda Madeiral, sendo dado um feedback muito positivo sobre o estado do jogo e seu funcionamento, com o jogo estando quase finalizado, faltando apenas alguns ajustes finos estéticos e de hitbox.
+
+## Dia 13 - quinto checkpoint (13/08/2025)
+
+No dia 13 de agosto pela manhã foi implementado um novo coletável de PowerUp de velocidade, sendo testado e aprovado. Também foram texturizadas as paredes do nível elevando o padrão estético do nível, foi marcado para 16h o checkpoint presencial para os monitores (DIA EM ATUALIZAÇÃO).
