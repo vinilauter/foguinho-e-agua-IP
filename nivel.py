@@ -7,6 +7,7 @@ from porta_final import Porta_final
 from plataforma_vertical_alavanca import Plataforma_movel_vertical
 from alavanca import Alavanca
 from plataforma_vertical_alavanca import Plataforma_movel_vertical
+from powerupvelocidade import PUP_Velocidade
 
 class Plataforma:
     def __init__(self, x, y, largura, altura):
@@ -74,6 +75,11 @@ def criar_primeiro_nivel():
         DiamanteAzul(420, 720 - 60),
     ]
 
+    powerup_1 = PUP_Velocidade((200, ALTURA - 180)) # da plataforma
+    powerup_2 = PUP_Velocidade((600, ALTURA - 50)) # do lago
+
+    powerups = [powerup_1, powerup_2]
+
     alavanca1 = Alavanca((500, 344), "verde")
     alavanca2 = Alavanca((600, 584), "azul")
 
@@ -107,5 +113,6 @@ def criar_primeiro_nivel():
         "diamantes": diamantes,
         "alavancas": alavancas,
         "plataformas_verticais": plataformas_verticais,
-        "plataformas_moveis_alavanca": plataformas_verticais
+        "plataformas_moveis_alavanca": plataformas_verticais,
+        "powerups": powerups
     }

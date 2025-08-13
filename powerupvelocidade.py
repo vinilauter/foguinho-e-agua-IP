@@ -5,10 +5,10 @@ class PUP_Velocidade(pygame.sprite.Sprite):
 
         super().__init__()
 
-        imagem_pup = pygame.image.load("velocidade.png").convert_alpha()
+        imagem_pup = pygame.image.load("Imagens/velocidade.png").convert_alpha()
 
         tamanho_pup = (50, 50)
-        self.image = pygame.transform.scale(imagem_pup, tamanho_pup)
+        self.image = pygame.transform.smoothscale(imagem_pup, tamanho_pup)
 
         self.rect = self.image.get_rect(center=posicao)
 

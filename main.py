@@ -68,6 +68,11 @@ class Jogo:
         self.plataformas_verticais = pygame.sprite.Group(nivel["plataformas_verticais"])
         self.plataformas_moveis_alavanca = nivel["plataformas_moveis_alavanca"]
 
+        self.powerups = pygame.sprite.Group()
+        if "powerups" in nivel:
+             for powerup in nivel["powerups"]:
+                 self.powerups.add(powerup)
+
     def executar(self):
         while True:
             self.relogio.tick(FPS)
@@ -143,6 +148,11 @@ class Jogo:
                 elif jogador.tipo == "fogo" and isinstance(diamante, DiamanteVermelho) and jogador.rect.colliderect(diamante.rect):
                     self.diamantes.remove(diamante)
 
+        for jogador in [self.jogador1, self.jogador2]:
+            for powerup in self.powerups.copy(): 
+                if powerup.checkar_colisao(jogador):
+                    jogador.ativar_powerup_velocidade(5000)
+
         # Atualiza cronômetro e alavancas
         self.alavancas.update()
         self.cronometro.update()
@@ -200,6 +210,8 @@ class Jogo:
                 plataforma.desenhar(JANELA)
             for diamante in self.diamantes:
                 diamante.desenhar(JANELA)
+
+            self.powerups.draw(JANELA)
 
             # Desenha as portas sempre (imagem já muda conforme trancada/destrancada)
             self.porta_fogo.desenhar(JANELA)
