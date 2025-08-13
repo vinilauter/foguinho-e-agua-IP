@@ -1,0 +1,39 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "D:/JOYCE/OneDrive/Área de Trabalho/game/map-demoo.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "D:/JOYCE/OneDrive/Área de Trabalho/game/map-demoo.tmx": {
+            "scale": 0.8228766025641026,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 623.422756706753,
+                "y": 360.3213398899655
+            }
+        },
+        "D:/JOYCE/OneDrive/Área de Trabalho/imgs/features.tsx": {
+            "scaleInDock": 1
+        },
+        "D:/JOYCE/OneDrive/Área de Trabalho/imgs/lagos.tsx": {
+            "scaleInDock": 1
+        },
+        "D:/JOYCE/OneDrive/Área de Trabalho/imgs/pisos.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "D:/JOYCE/OneDrive/Área de Trabalho/imgs/texturas.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+        "D:/JOYCE/OneDrive/Área de Trabalho/game/map-demoo.tmx"
+    ],
+    "project": "sem título.tiled-project",
+    "recentFiles": [
+        "D:/JOYCE/OneDrive/Área de Trabalho/game/map-demoo.tmx"
+    ]
+}

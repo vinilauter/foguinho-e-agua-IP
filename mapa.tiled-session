@@ -1,0 +1,29 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
+    "fileStates": {
+        "tiles-mapa/elementos.tsx": {
+            "dynamicWrapping": true
+        },
+        "tiles-mapa/lagos.tsx": {
+            "dynamicWrapping": true
+        },
+        "tiles-mapa/texturas.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/joyce/Documents/estudos/python IP/joguin/foguinho-e-agua-IP/Imagens",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+    ],
+    "project": "mapa.tiled-project",
+    "recentFiles": [
+        "tiles-mapa/texturas.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
+}
