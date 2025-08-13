@@ -19,9 +19,8 @@ PRETO = (0, 0, 0)
 MENU, JOGANDO, VITORIA = "menu", "jogando", "vitoria"
 
 class Jogo:
-    # ... (O método __init__ e a maior parte da classe permanecem idênticos) ...
     def __init__(self):
-        carregar_sprites_diamantes()
+        carregar_sprites_diamantes()  # Não esqueça de chamar essa função antes de criar os diamantes!
 
         self.relogio = pygame.time.Clock()
         self.fonte_geral = pygame.font.Font(None, 36)
@@ -29,10 +28,13 @@ class Jogo:
         self.estado = MENU
         self.cronometro = Cronometro(fonte=self.fonte_geral, posicao=(0,0), cor=BRANCO)
 
+        # Moldura do timer
         self.moldura_timer_img = pygame.image.load("Imagens/moldura_timer.png").convert_alpha()
         self.moldura_timer_img = pygame.transform.scale(self.moldura_timer_img, (150, 65))
         self.moldura_timer_rect = self.moldura_timer_img.get_rect(midtop=((LARGURA // 2), 0))
 
+        
+        # Ajuste do cronômetro para ficar centralizado na moldura do timer
         self.cronometro.fonte = pygame.font.Font(None, 28)
         self.cronometro.centralizado = True
         self.cronometro.posicao = (
@@ -40,10 +42,13 @@ class Jogo:
             self.moldura_timer_rect.top + self.moldura_timer_rect.height // 2
         )
 
+        # Carrega background e ajusta tamanho
         self.background = pygame.image.load("Imagens/background.png").convert()
         self.background = pygame.transform.scale(self.background, (LARGURA, ALTURA))
+        
+        # Imagem do menu
         self.imagem_menu = pygame.image.load("Imagens/tela_inicial_jogo.png").convert_alpha()
-        self.imagem_menu = pygame.transform.scale(self.imagem_menu, (LARGURA, ALTURA))
+        self.imagem_menu = pygame.transform.scale(self.imagem_menu, (LARGURA, ALTURA))  # ajusta para a tela toda
 
         nivel = criar_primeiro_nivel()
 
@@ -57,33 +62,16 @@ class Jogo:
         self.porta_fogo = nivel["porta_fogo"]
         self.porta_agua = nivel["porta_agua"]
         self.diamantes = nivel["diamantes"]
-        
         self.alavancas = pygame.sprite.Group()
-        if "alavancas" in nivel:
-            for alavanca in nivel["alavancas"]:
-                self.alavancas.add(alavanca)
-        
-        self.plataformas_verticais = pygame.sprite.Group(nivel.get("plataformas_verticais", []))
-        self.plataformas_moveis_alavanca = nivel.get("plataformas_moveis_alavanca", [])
+        for alavanca in nivel["alavancas"]:
+            self.alavancas.add(alavanca)
+        self.plataformas_verticais = pygame.sprite.Group(nivel["plataformas_verticais"])
+        self.plataformas_moveis_alavanca = nivel["plataformas_moveis_alavanca"]
 
         self.powerups = pygame.sprite.Group()
         if "powerups" in nivel:
-            for powerup in nivel["powerups"]:
-                self.powerups.add(powerup)
-        
-        self.botoes_unicos_ativados = 0
-        self.alavancas_unicas_ativadas = 0
-        self.powerups_usados = 0
-        
-        self.botao_1_ja_foi_contado = False
-        self.botao_2_ja_foi_contado = False
-        
-        try:
-            self.alavancas_ja_foram_contadas = {alavanca: alavanca.ativada for alavanca in self.alavancas}
-        except AttributeError:
-            self.alavancas_ja_foram_contadas = {alavanca: False for alavanca in self.alavancas}
-
-        self.total_diamantes_nivel = len(self.diamantes)
+             for powerup in nivel["powerups"]:
+                 self.powerups.add(powerup)
 
     def executar(self):
         while True:
@@ -112,75 +100,93 @@ class Jogo:
         self.jogador1.update(teclas)
         self.jogador2.update(teclas)
 
-        plataformas_colidiveis = self.plataformas + [self.plataforma_movel] + list(self.plataformas_moveis_alavanca) + list(self.plataformas_verticais)
+        # Aplicar gravidade e checar colisões (encapsulado para cada jogador)
         for jogador in [self.jogador1, self.jogador2]:
             jogador.aplicar_gravidade()
-            lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
-            jogador.checar_colisao(plataformas_colidiveis + lagos_solidos)
         
+            # lagos sólidos para jogador de mesmo tipo do lago
+            lagos_solidos = [lago for lago in self.lagos if lago.tipo == jogador.tipo]
+        
+            # passa plataformas + lagos sólidos para colisão
+            jogador.checar_colisao(self.plataformas + [self.plataforma_movel] + list(self.plataformas_moveis_alavanca) + lagos_solidos)
+        
+        # depois, verifica se jogador colidiu com lago que não é dele — para matar
         for jogador in [self.jogador1, self.jogador2]:
             for lago in self.lagos:
-                if jogador.rect.colliderect(lago.rect) and lago.tipo != jogador.tipo:
-                    self.__init__()
-                    return
+                if jogador.rect.colliderect(lago.rect):
+                    if lago.tipo != jogador.tipo:
+                        # jogador caiu no lago errado → reinicia jogo
+                        self.__init__()
+                        return
 
+        # Atualizar ativação dos botões (assumindo que o método se chama atualizar e recebe lista de jogadores)
         self.botao_movel_1.atualizar([self.jogador1, self.jogador2])
         self.botao_movel_2.atualizar([self.jogador1, self.jogador2])
         ativado = self.botao_movel_1.pressionado or self.botao_movel_2.pressionado
         self.plataforma_movel.atualizar(ativado)
 
-        if self.botao_movel_1.pressionado and not self.botao_1_ja_foi_contado:
-            self.botoes_unicos_ativados += 1
-            self.botao_1_ja_foi_contado = True
+        # Mover jogadores junto com a plataforma se estiverem em cima dela
+        for jogador in [self.jogador1, self.jogador2]:
+            if jogador.rect.colliderect(self.plataforma_movel.rect):
+                # Checa se está em cima da plataforma (não do lado ou dentro)
+                if abs(jogador.rect.bottom - self.plataforma_movel.rect.top) <= 5:
+                    jogador.rect.y += self.plataforma_movel.velocidade_y
 
-        if self.botao_movel_2.pressionado and not self.botao_2_ja_foi_contado:
-            self.botoes_unicos_ativados += 1
-            self.botao_2_ja_foi_contado = True
+        # Reiniciar nível se jogador cair na água ou lava
+        for jogador in [self.jogador1, self.jogador2]:
+            for lago in self.lagos:
+                if jogador.rect.colliderect(lago.rect): # Só reinicia se Fogo cair na Àgua e vice-versa
+                    if (jogador.tipo == "fogo" and lago.tipo == "agua") or (jogador.tipo == "agua" and lago.tipo == "fogo"):
+                        self.__init__()
+                        return
 
+        # Checar coleta dos diamantes para cada jogador
         for jogador in [self.jogador1, self.jogador2]:
             for diamante in self.diamantes[:]:
-                if (jogador.tipo == "agua" and isinstance(diamante, DiamanteAzul) and jogador.rect.colliderect(diamante.rect)) or \
-                   (jogador.tipo == "fogo" and isinstance(diamante, DiamanteVermelho) and jogador.rect.colliderect(diamante.rect)):
+                if jogador.tipo == "agua" and isinstance(diamante, DiamanteAzul) and jogador.rect.colliderect(diamante.rect):
+                    self.diamantes.remove(diamante)
+                elif jogador.tipo == "fogo" and isinstance(diamante, DiamanteVermelho) and jogador.rect.colliderect(diamante.rect):
                     self.diamantes.remove(diamante)
 
         for jogador in [self.jogador1, self.jogador2]:
             for powerup in self.powerups.copy(): 
                 if powerup.checkar_colisao(jogador):
                     jogador.ativar_powerup_velocidade(5000)
-                    self.powerups_usados += 1
-                    powerup.kill()
 
+        # Atualiza cronômetro e alavancas
         self.alavancas.update()
+        self.cronometro.update()
         for jogador in [self.jogador1, self.jogador2]:
             for alavanca in self.alavancas:
                 alavanca.check_colisao(jogador)
-        
         for plataforma in self.plataformas_moveis_alavanca:
             plataforma.update()
         self.plataformas_verticais.update()
-        
-        for alavanca in self.alavancas:
-            if alavanca.ativada and not self.alavancas_ja_foram_contadas[alavanca]:
-                self.alavancas_unicas_ativadas += 1
-                self.alavancas_ja_foram_contadas[alavanca] = True
 
-        self.cronometro.update()
-        
+        # Destrancar portas se todos os diamantes coletados
         todos_coletados = not self.diamantes
+
+        # Define jogadores por tipo
         jogadores = [self.jogador1, self.jogador2]
         jogador_fogo = next((j for j in jogadores if j.tipo == "fogo"), None)
         jogador_agua = next((j for j in jogadores if j.tipo == "agua"), None)
+
+        # Destranca portas apenas quando jogador certo encostar, e todos os diamantes forem coletados
         if todos_coletados:
             if jogador_fogo and jogador_fogo.rect.colliderect(self.porta_fogo.rect):
                 self.porta_fogo.destrancar()
             if jogador_agua and jogador_agua.rect.colliderect(self.porta_agua.rect):
                 self.porta_agua.destrancar()
+
+            # Verifica vitória: ambos jogadores nas portas destrancadas
             if (jogador_fogo and not self.porta_fogo.trancada and jogador_fogo.rect.colliderect(self.porta_fogo.rect) and
                 jogador_agua and not self.porta_agua.trancada and jogador_agua.rect.colliderect(self.porta_agua.rect)):
                 self.estado = VITORIA
 
     def desenhar_menu(self):
         JANELA.blit(self.imagem_menu, (0, 0))
+
+        # Retângulo semitransparente atrás do texto para destacar
         s = pygame.Surface((LARGURA, 150), pygame.SRCALPHA)
         s.fill((0, 0, 0, 150))
         JANELA.blit(s, (0, ALTURA//3 - 50))
@@ -189,13 +195,13 @@ class Jogo:
         JANELA.blit(texto_instrucao, rect_instrucao)
 
     def desenhar(self):
+        # Desenha o background primeiro para ficar atrás de tudo
         JANELA.blit(self.background, (0, 0))
 
         if self.estado == MENU:
             self.desenhar_menu()
 
         elif self.estado == JOGANDO:
-            # ... (desenho dos elementos do jogo permanece o mesmo) ...
             for plataforma in self.plataformas:
                 plataforma.desenhar(JANELA)
             for plataforma in self.plataformas_moveis_alavanca:
@@ -204,47 +210,44 @@ class Jogo:
                 plataforma.desenhar(JANELA)
             for diamante in self.diamantes:
                 diamante.desenhar(JANELA)
+
             self.powerups.draw(JANELA)
+
+            # Desenha as portas sempre (imagem já muda conforme trancada/destrancada)
             self.porta_fogo.desenhar(JANELA)
             self.porta_agua.desenhar(JANELA)
+
             self.alavancas.draw(JANELA)
+            
+            # Desenha jogadores antes dos botões para que botões fiquem na frente
             self.jogador1.desenhar(JANELA)
             self.jogador2.desenhar(JANELA)
+
             self.botao_movel_1.desenhar(JANELA)
             self.botao_movel_2.desenhar(JANELA)
             self.plataforma_movel.desenhar(JANELA)
+
             for lago in self.lagos:
                 lago.desenhar(JANELA)
 
-            # UI e Contadores
+            # Moldura do timer e cronometro
             JANELA.blit(self.moldura_timer_img, self.moldura_timer_rect)
             self.cronometro.desenhar(JANELA)
 
-            # MODIFICADO: Chamadas para desenhar os contadores agora usam a nova função
-            # para alinhá-los à direita da tela.
-            coletados = self.total_diamantes_nivel - len(self.diamantes)
-            self.desenhar_texto_direita(f"Diamantes: {coletados}/{self.total_diamantes_nivel}", 20, self.fonte_geral)
-            
-            self.desenhar_texto_direita(f"Botões: {self.botoes_unicos_ativados}", 50, self.fonte_geral)
-            self.desenhar_texto_direita(f"Alavancas: {self.alavancas_unicas_ativadas}", 80, self.fonte_geral)
-            self.desenhar_texto_direita(f"Power-ups: {self.powerups_usados}", 110, self.fonte_geral)
+            # Lógica original de contagem de diamantes
+            total_diamantes = 4 # Defina o total de diamantes do seu nível
+            coletados = total_diamantes - len(self.diamantes)
+            self.desenhar_texto(f"    Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
             self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 100, 200, self.fonte_titulo)
+
         
         pygame.display.flip()
 
     def desenhar_texto(self, texto, x, y, fonte):
         rotulo = fonte.render(texto, True, BRANCO)
         JANELA.blit(rotulo, (x, y))
-
-    # NOVO: Função auxiliar para desenhar texto alinhado à direita
-    def desenhar_texto_direita(self, texto, y, fonte, cor=BRANCO, margem=20):
-        """Desenha um texto na janela, alinhado ao canto superior direito."""
-        superficie_texto = fonte.render(texto, True, cor)
-        # Cria um retângulo para o texto e define sua posição com base no canto superior direito
-        rect_texto = superficie_texto.get_rect(topright=(LARGURA - margem, y))
-        JANELA.blit(superficie_texto, rect_texto)
 
 def main():
     carregar_sprites_diamantes()
