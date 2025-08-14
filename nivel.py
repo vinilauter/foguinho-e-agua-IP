@@ -234,3 +234,4 @@ def criar_primeiro_nivel():
         "plataformas_moveis_alavanca": plataformas_verticais,
         "powerups": powerups 
     }
+
