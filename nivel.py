@@ -8,7 +8,7 @@ from plataforma_vertical_alavanca import Plataforma_movel_vertical
 from alavanca import Alavanca
 from powerupvelocidade import PUP_Velocidade
 
-import pygame
+
 
 class Plataforma:
     def __init__(self, x, y, largura, altura, tipo="piso"):
@@ -17,55 +17,76 @@ class Plataforma:
 
         if self.tipo == "piso":
             try:
-                self.img_canto_esq = pygame.image.load("imagens/plataforma_canto_esq.png").convert_alpha()
-                self.img_meio = pygame.image.load("imagens/plataforma_meio.png").convert_alpha()
-                self.img_canto_dir = pygame.image.load("imagens/plataforma_canto_dir.png").convert_alpha()
-                self.image = self.img_meio
-            except FileNotFoundError:
-                # Cria blocos genéricos quando as imagens não existem
-                self.img_canto_esq = pygame.Surface((largura, altura))
-                self.img_meio = pygame.Surface((largura, altura))
-                self.img_canto_dir = pygame.Surface((largura, altura))
+                self.img_canto_esq = pygame.image.load("Imagens/piso1.png").convert_alpha()
+                self.img_meio = pygame.image.load("Imagens/piso3.png").convert_alpha()
+                self.img_canto_dir = pygame.image.load("Imagens/piso14.png").convert_alpha()
 
-                self.img_canto_esq.fill((128, 128, 128))
-                self.img_meio.fill((128, 128, 128))
-                self.img_canto_dir.fill((128, 128, 128))
+                nova_altura_borda = self.rect.height
+                self.img_canto_esq = pygame.transform.scale(self.img_canto_esq, (nova_altura_borda, nova_altura_borda))
+                self.img_meio = pygame.transform.scale(self.img_meio, (nova_altura_borda, nova_altura_borda))
+                self.img_canto_dir = pygame.transform.scale(self.img_canto_dir, (nova_altura_borda, nova_altura_borda))
+
+
+
+
+
 
                 self.image = self.img_meio
+            except FileNotFoundError as e:
+                self.image = pygame.Surface((largura, altura))
+                self.image.fill((128, 128, 128))
 
         elif self.tipo == "parede":
             try:
-                self.blocos_parede = [
-                    pygame.image.load("imagens/parede1.png").convert_alpha(),
-                    pygame.image.load("imagens/parede2.png").convert_alpha(),
-                    pygame.image.load("imagens/parede3.png").convert_alpha()
-                ]
-                self.image = self.blocos_parede[0]
+                bloco = pygame.image.load("Imagens\piso8.png").convert_alpha()
+                bloco = pygame.transform.scale(bloco, (24, 24))  # tamanho fixo 20x20
+                self.blocos_parede = bloco
+                self.image = pygame.Surface((largura, altura), pygame.SRCALPHA)
             except FileNotFoundError:
-                # Bloco cinza genérico se não encontrar imagem
-                self.image = pygame.Surface((largura, altura))
-                self.image.fill((100, 100, 100))
+                self.blocos_parede = pygame.Surface((24, 24))
+                self.blocos_parede.fill((128, 128, 128))
+                self.image = pygame.Surface((largura, altura), pygame.SRCALPHA)
+        else:
+            caminho_imagem = f"Imagens/{tipo}.png"
+            try:
+                self.image = pygame.image.load(caminho_imagem).convert_alpha()
+                self.image = pygame.transform.scale(self.image, (largura, altura))
+            except FileNotFoundError:
 
-    def desenhar(self, janela):
+                self.image = pygame.Surface((largura, altura))
+                self.image.fill((128, 128, 128))
+
+    def update(self):
+        pass
+
+    def desenhar(self, tela):
         if self.tipo == "piso":
-            largura_bloco = self.img_meio.get_width()
             altura_bloco = self.img_meio.get_height()
+            largura_bloco = self.img_meio.get_width()
+
             num_blocos = self.rect.width // largura_bloco
 
-            for i in range(num_blocos):
-                if i == 0:
-                    janela.blit(self.img_canto_esq, (self.rect.x, self.rect.y))
-                elif i == num_blocos - 1:
-                    janela.blit(self.img_canto_dir, (self.rect.x + i * largura_bloco, self.rect.y))
-                else:
-                    janela.blit(self.img_meio, (self.rect.x + i * largura_bloco, self.rect.y))
+            tela.blit(self.img_canto_esq, (self.rect.x, self.rect.y))
 
+            for i in range(1, num_blocos - 1):
+                tela.blit(self.img_meio, (self.rect.x + i * largura_bloco, self.rect.y))
+
+
+
+
+            if num_blocos > 1:
+                tela.blit(self.img_canto_dir, (self.rect.x + (num_blocos - 1) * largura_bloco, self.rect.y))
         elif self.tipo == "parede":
-            altura_bloco = self.image.get_height()
-            num_blocos = self.rect.height // altura_bloco
-            for i in range(num_blocos):
-                janela.blit(self.image, (self.rect.x, self.rect.y + i * altura_bloco))
+            largura_bloco = self.blocos_parede.get_width()
+            altura_bloco = self.blocos_parede.get_height()
 
+            for y in range(self.rect.y, self.rect.y + self.rect.height, altura_bloco):
+                for x in range(self.rect.x, self.rect.x + self.rect.width, largura_bloco):
+                    tela.blit(self.blocos_parede, (x, y))
+
+        else:
+            tela.blit(self.image, self.rect)
+            
 class PisoSimples:
     def __init__(self, x, y, largura, altura, caminho_imagem):
         self.rect = pygame.Rect(x, y, largura, altura)
@@ -75,7 +96,7 @@ class PisoSimples:
         except FileNotFoundError as e:
             self.image_bloco = pygame.Surface((self.rect.height, self.rect.height))
             self.image_bloco.fill((128, 128, 128))
-            
+
     def desenhar(self, tela):
         largura_bloco = self.image_bloco.get_width()
         for x in range(self.rect.left, self.rect.right, largura_bloco):
@@ -93,7 +114,7 @@ class Lago:
         self.frame_atual = 0
         self.velocidade_animacao = 250
         self.ultimo_update = pygame.time.get_ticks()
-        
+
         mapeamento = {
             "agua": {
                 "nomes": ["lago-azul.png", "lago-azul1.png", "lago-azul2.png", "lago-azul3.png", "lago-azul4.png"],
@@ -121,14 +142,14 @@ class Lago:
                 except FileNotFoundError:
                     carregamento_bem_sucedido = False
                     break
-            
+
             if not carregamento_bem_sucedido or not self.frames:
                 self.frames = [pygame.Surface((largura, altura))]
                 self.frames[0].fill(info_lago["cor"])
         else:
             self.frames = [pygame.Surface((largura, altura))]
             self.frames[0].fill((128, 128, 128))
-        
+
         self.image = self.frames[self.frame_atual]
 
     def update(self):
@@ -144,7 +165,7 @@ class Lago:
 def criar_primeiro_nivel():
     ALTURA = 720
     LARGURA = 1280
-    
+
     plataformas = [
         PisoSimples(20, ALTURA - 38, 252, 40, "Imagens/piso3.png"),
         PisoSimples(460, ALTURA - 38, 60, 40, "Imagens/piso3.png"),
@@ -234,4 +255,3 @@ def criar_primeiro_nivel():
         "plataformas_moveis_alavanca": plataformas_verticais,
         "powerups": powerups 
     }
-
