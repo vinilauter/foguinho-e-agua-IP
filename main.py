@@ -180,6 +180,10 @@ class Jogo:
                 self.alavancas_ja_foram_contadas[alavanca] = True
 
         self.cronometro.update()
+
+        # LOOP PARA ATUALIZAR OS LAGOS
+        for lago in self.lagos:
+            lago.update()
         
         # Lógica de vitória
         todos_coletados = not self.diamantes
