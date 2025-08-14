@@ -60,4 +60,4 @@ No dia 11 de agosto foi feito um checkpoint presencial com a professora Fernanda
 
 ## Dia 13 - quinto checkpoint (13/08/2025)
 
-No dia 13 de agosto pela manhã foi implementado um novo coletável de PowerUp de velocidade, sendo testado e aprovado. Também foram texturizadas as paredes do nível elevando o padrão estético do nível, foi marcado para 16h o checkpoint presencial para os monitores (DIA EM ATUALIZAÇÃO).
+No dia 13 de agosto pela manhã foi implementado um novo coletável de PowerUp de velocidade, sendo testado e aprovado. Também foram texturizadas as paredes do nível elevando o padrão estético do nível, foi marcado para 16h o checkpoint presencial para os monitores. No checkpoint tudo correu bem, sendo o projeto bastante elogiado e foram repassadas orientações para a finalização do relatório e confecção da apresentação.
