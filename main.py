@@ -32,7 +32,6 @@ class Jogo:
         self.moldura_timer_img = pygame.image.load("Imagens/moldura_timer.png").convert_alpha()
         self.moldura_timer_img = pygame.transform.scale(self.moldura_timer_img, (150, 65))
         self.moldura_timer_rect = self.moldura_timer_img.get_rect(midtop=((LARGURA // 2), 0))
-
         
         # Ajuste do cronômetro para ficar centralizado na moldura do timer
         self.cronometro.fonte = pygame.font.Font(None, 28)
@@ -68,6 +67,7 @@ class Jogo:
         self.plataformas_verticais = pygame.sprite.Group(nivel["plataformas_verticais"])
         self.plataformas_moveis_alavanca = nivel["plataformas_moveis_alavanca"]
 
+        #  logica do powerup
         self.powerups = pygame.sprite.Group()
         if "powerups" in nivel:
              for powerup in nivel["powerups"]:
@@ -156,6 +156,11 @@ class Jogo:
         # Atualiza cronômetro e alavancas
         self.alavancas.update()
         self.cronometro.update()
+        
+        # --- LOOP PARA ATUALIZAR OS LAGOS ---
+        for lago in self.lagos:
+            lago.update()
+            
         for jogador in [self.jogador1, self.jogador2]:
             for alavanca in self.alavancas:
                 alavanca.check_colisao(jogador)
@@ -237,7 +242,7 @@ class Jogo:
             # Lógica original de contagem de diamantes
             total_diamantes = 4 # Defina o total de diamantes do seu nível
             coletados = total_diamantes - len(self.diamantes)
-            self.desenhar_texto(f"    Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
+            self.desenhar_texto(f"    Diamantes: {coletados}/{total_diamantes}", 10, 50, self.fonte_geral)
 
         elif self.estado == VITORIA:
             self.desenhar_texto("Vocês venceram! Pressione R para reiniciar", 100, 200, self.fonte_titulo)
