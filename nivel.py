@@ -155,23 +155,23 @@ def criar_primeiro_nivel():
     LARGURA = 1280
     
     plataformas = [
-        PisoSimples(20, ALTURA - 38, 252, 40, "Imagens/piso3.png"),
-        PisoSimples(460, ALTURA - 38, 60, 40, "Imagens/piso3.png"),
+        PisoSimples(20, ALTURA - 38, 275, 40, "Imagens/piso3.png"),
+        PisoSimples(460, ALTURA - 38, 78, 40, "Imagens/piso3.png"),
         PisoSimples(700, ALTURA - 38, 192, 40, "Imagens/piso3.png"),
-        PisoSimples(1060, ALTURA - 38, 192, 40, "Imagens/piso3.png"),
+        PisoSimples(1057, ALTURA - 38, 192, 40, "Imagens/piso3.png"),
 
         Plataforma(0, 0, LARGURA, 20, "parede"),
         Plataforma(0, 0, 20, ALTURA, "parede"),
         Plataforma(LARGURA - 20, 0, 20, ALTURA, "parede"),
 
-        Plataforma (20, 150, 216, 32, "piso"),
-        Plataforma(100, 560, 216, 32, "piso"), 
-        Plataforma(500, 560, 216, 32, "piso"), 
-        Plataforma(300, 440, 216, 32, "piso"),
-        Plataforma(800, 440, 216, 32, "piso"),
+        Plataforma (20, 150, 192, 32, "piso"),
+        Plataforma(100, 560, 192, 32, "piso"), 
+        Plataforma(500, 560, 226, 32, "piso"), 
+        Plataforma(300, 440, 192, 32, "piso"),
+        Plataforma(800, 440, 192, 32, "piso"),
         Plataforma(22, 320, 1120, 32, "piso"),
         #Plataforma(908.9, 320, 250, 81, "piso"),
-        Plataforma(290, 102, 216, 32, "piso"),
+        Plataforma(290, 147, 192, 32, "piso"),
         Plataforma(600, 180, 100, 32, "piso"),
     ]
 
@@ -241,4 +241,5 @@ def criar_primeiro_nivel():
         "plataformas_verticais": plataformas_verticais,
         "plataformas_moveis_alavanca": plataformas_verticais,
         "powerups": powerups 
+
     }
