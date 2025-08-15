@@ -223,7 +223,7 @@ Todo o projeto foi estruturado em torno da POO, onde cada elemento do jogo é um
 ## Fase desenvolvida pela equipe
 ![Screenshot da Fase](Imagens/fase_screenshot.png)
 
-## Tela de vitório
+## Tela de vitória
 ![Tela de vitória](Imagens/final_screenshot.png)
 
 # Desafios e aprendizados
