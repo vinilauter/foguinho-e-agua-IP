@@ -50,29 +50,34 @@ class Jogador(pygame.sprite.Sprite):
             self.vel_y += self.gravidade
 
     def checar_colisao(self, plataformas):
-        self.pode_pular = False
-
         self.rect.x += self.vel_x
-        for plataforma in plataformas:
-            rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
-            if self.rect.colliderect(rect_plataforma):
-                if self.vel_x > 0:
-                    self.rect.right = rect_plataforma.left
-                elif self.vel_x < 0:
-                    self.rect.left = rect_plataforma.right
-                self.vel_x = 0
-
+        
+        if hasattr(self, 'hitbox'):
+            self.hitbox.centerx = self.rect.centerx
+            for plataforma in plataformas:
+                rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
+                if self.hitbox.colliderect(rect_plataforma):
+                    if self.vel_x > 0:
+                        self.hitbox.right = rect_plataforma.left
+                    if self.vel_x < 0:
+                        self.hitbox.left = rect_plataforma.right
+                    self.rect.centerx = self.hitbox.centerx
+        
         self.rect.y += self.vel_y
-        for plataforma in plataformas:
-            rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
-            if self.rect.colliderect(rect_plataforma):
-                if self.vel_y > 0 and self.rect.bottom <= rect_plataforma.bottom:
-                    self.rect.bottom = rect_plataforma.top
-                    self.vel_y = 0
-                    self.pode_pular = True
-                elif self.vel_y < 0:
-                    self.rect.top = rect_plataforma.bottom
-                    self.vel_y = 0
-
+        self.pode_pular = False
+        
+        if hasattr(self, 'hitbox'):
+            self.hitbox.centery = self.rect.centery
+            for plataforma in plataformas:
+                rect_plataforma = plataforma.rect if hasattr(plataforma, 'rect') else plataforma
+                if self.hitbox.colliderect(rect_plataforma):
+                    if self.vel_y > 0:
+                        self.hitbox.bottom = rect_plataforma.top
+                        self.pode_pular = True
+                        self.vel_y = 0
+                    if self.vel_y < 0:
+                        self.hitbox.top = rect_plataforma.bottom
+                        self.vel_y = 0
+                    self.rect.centery = self.hitbox.centery
     def desenhar(self, tela):
         tela.blit(self.image, self.rect)
