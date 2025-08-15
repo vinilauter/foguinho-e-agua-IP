@@ -3,12 +3,16 @@
 Projeto final da disciplina de introdução à programação: reprodução do jogo Fireboy and Watergirl em Python
 
 Integrantes:
-* Bruno Melo (bslm))
+* Bruno Melo (bslm)
 * Caique Machado (cmso)
 * Joyce Gomes (jogg)
 * Ricardo Lira (rcl4)
 * Robson (rlcj)
 * Vinicius Oliveira (vlfo)
+
+## Introdução
+
+Este repositório contém o código-fonte do projeto final da disciplina de Introdução à Programação, uma recriação funcional do clássico jogo de plataforma "Fireboy and Watergirl". Desenvolvido em Python com a biblioteca Pygame, o projeto implementa mecânicas de jogo complexas, física de personagens, uma arquitetura de software modular e orientada a objetos.
 
 ### Dia 1 - lançamento do projeto (01/08/2025)
 
@@ -82,28 +86,68 @@ No dia 13 de agosto pela manhã foi implementado um novo coletável de PowerUp d
 
 O código é modularizado e dividido em vários arquivos separados que são importados de acordo com sua utilização na main ou em arquivos complementares
 
-### Métodos
+* **`main.py`**: Gerencia o estado geral do jogo, o loop principal, os eventos e coordena a atualização e renderização de todos os objetos em tela.
+* **`nivel.py`**: Define e constrói a arquitetura da fase, instanciando e posicionando todos os objetos do jogo, como plataformas, jogadores e itens.
+* **`jogador.py`**: Contém a classe `Jogador` base, que implementa toda a física de movimento, pulo, gravidade e colisão comum a ambos os personagens.
+* **`foguinho.py`**: Define a classe `Foguinho`, que herda de `Jogador` e especifica as características únicas do personagem de fogo, como sua imagem e tipo.
+* **`agua.py`**: Define a classe `Agua`, que herda de `Jogador` e especifica as características únicas da personagem de água, como sua imagem e tipo.
+* **`alavanca.py`**: Implementa a classe `Alavanca`, um objeto interativo com estados, cooldown e hitboxes separadas para ativação e desativação.
+* **`diamante.py`**: Gerencia os diamantes colecionáveis, definindo uma classe base e classes filhas para cada cor, que só podem ser coletadas pelo jogador correspondente.
+* **`cronometro.py`**: Implementa um cronômetro para o jogo, controlando a contagem do tempo e sua exibição formatada na tela.
+* **`nova_plataforma_movel.py`**: Define as classes `Botao` e `Plataforma_Movel`, implementando a mecânica de plataformas que se movem quando um ou mais jogadores estão sobre um botão.
+* **`plataforma_vertical_alavanca.py`**: Implementa a `Plataforma_movel_vertical`, cujo movimento entre dois pontos é diretamente controlado pelo estado de uma alavanca associada.
+  
+## Análise de Métodos de Classes Chave
 
-* **`__init__(self, x, y, cor, controles)`**
-    * Construtor da classe. Inicializa o sprite do jogador em uma posição `(x, y)` específica, define sua `cor`, seus `controles` de teclado e configura todas as variáveis de física (gravidade, pulo) e de estado (velocidade, power-ups).
+# Análise de Métodos de Classes Chave
 
-* **`update(self, teclas)`**
-    * Chamado a cada frame. Verifica se o efeito do power-up de velocidade expirou. Lê o estado atual das `teclas` pressionadas para definir a velocidade horizontal do jogador e para iniciar a ação de pular.
+### Classe `Jogador` (`jogador.py`)
 
-* **`ativar_powerup_velocidade(self, duracao_ms)`**
-    * Ativa o bônus de velocidade. Aumenta a `velocidade_atual` do jogador e define um temporizador para a `duração` do efeito.
+* **`__init__(self, x, y, cor, controles)`**: Inicializa o jogador com posição, cor, controles e todas as variáveis de física e estado.
+* **`update(self, teclas)`**: Chamado a cada frame, atualiza o estado do jogador com base nas teclas pressionadas e verifica a duração de power-ups ativos.
+* **`aplicar_gravidade(self)`**: Simula o efeito da aceleração da gravidade, alterando a velocidade vertical do jogador.
+* **`checar_colisao(self, plataformas)`**: Motor de física que detecta e trata as colisões do jogador com as plataformas e outros objetos do nível.
+* **`ativar_powerup_velocidade(self, duracao_ms)`**: Ativa o bônus de velocidade, aumentando a velocidade de movimento do jogador por um tempo determinado.
 
-* **`desativar_powerup_velocidade(self)`**
-    * Restaura a velocidade normal. Chamado quando o tempo do power-up acaba, revertendo a `velocidade_atual` do jogador para o seu valor padrão.
+### Classe `Alavanca` (`alavanca.py`)
 
-* **`aplicar_gravidade(self)`**
-    * Simula a gravidade. Aumenta a velocidade vertical (`vel_y`) do jogador a cada frame, criando o efeito de aceleração para baixo.
+* **`__init__(self, posicao, cor, ativada=False)`**: Inicializa a alavanca em uma posição, definindo sua cor, estado inicial e as duas hitboxes (ativar/desativar).
+* **`update(self)`**: Atualiza a imagem da alavanca para refletir seu estado atual (ligada ou desligada).
+* **`check_colisao(self, jogador)`**: Verifica se o jogador está colidindo com uma das hitboxes específicas e, respeitando um cooldown, decide se deve ou não alterar o estado da alavanca.
+* **`toggle(self)`**: Inverte o estado da alavanca (de `ativada` para `desativada` e vice-versa).
 
-* **`checar_colisao(self, plataformas)`**
-    * Método para a física e colisão. Move o jogador nos eixos X e Y separadamente, verificando colisões com a lista de `plataformas` a cada passo. Ajusta a posição do jogador para evitar que ele atravesse objetos e define a flag `pode_pular` como `True` quando ele está sobre uma superfície.
+### Classe `Plataforma_movel_vertical` (`plataforma_vertical_alavanca.py`)
 
-* **`desenhar(self, tela)`**
-    * Renderiza o jogador. Método simples para desenhar a imagem (`self.image`) do jogador na `tela` na sua posição atual (`self.rect`).
+* **`__init__(self, posicao_inicial, posicao_final, alavanca_designada, cor)`**: Configura a plataforma com suas posições de início e fim, velocidade e a instância da `alavanca_designada` que a controla.
+* **`update(self)`**: Verifica o estado (`ativada`) da alavanca designada e move a plataforma suavemente em direção à sua posição inicial ou final.
+
+### Classe `Botao` (`nova_plataforma_movel.py`)
+
+* **`__init__(self, x, y)`**: Inicializa o botão em uma posição e carrega os frames para sua animação de pressionamento.
+* **`atualizar(self, jogadores)`**: Verifica se algum jogador está sobre o botão para definir seu estado como `pressionado` e avança na animação visual.
+
+### Classe `Plataforma_Movel` (`nova_plataforma_movel.py`)
+
+* **`__init__(self, x, y, largura, altura, y_final, velocidade)`**: Configura a plataforma com suas posições, velocidade e imagens de estado (ativada/desativada).
+* **`atualizar(self, ativado)`**: Recebe o estado `ativado` (proveniente dos botões) e move a plataforma para sua posição de destino.
+
+### Classe `Diamante` (`diamante.py`)
+
+* **`__init__(self, x, y)`**: Construtor da classe base, chamado pelas classes filhas (`DiamanteVermelho` e `DiamanteAzul`) para definir a posição do diamante.
+* **`desenhar(self, tela)`**: Renderiza a imagem do diamante na tela caso ele ainda não tenha sido coletado.
+* **`checar_coleta(self, jogador)`**: (Método não utilizado na versão final, a lógica foi centralizada no `main.py`).
+
+### Classe `Porta_final` (`porta_final.py`)
+
+* **`__init__(self, posicao, elemento, trancada=True)`**: Inicializa a porta com sua imagem específica de elemento (`fogo` ou `agua`), cria uma superfície transparente para o estado "destrancada" e define seu estado inicial.
+* **`destrancar(self)`**: Altera o estado da porta para `trancada = False` e atualiza sua imagem para a superfície transparente, fazendo-a "desaparecer".
+
+### Classe `Cronometro` (`cronometro.py`)
+
+* **`__init__(self, fonte, posicao, cor)`**: Configura o cronômetro com a fonte, posição e cor para a exibição do tempo.
+* **`update(self)`**: Atualiza o tempo decorrido, sendo chamado a cada frame pelo loop principal do jogo.
+* **`reset(self)`**: Reinicia a contagem do cronômetro para zero.
+* **`desenhar(self, tela)`**: Formata o tempo decorrido para o formato `MM:SS` e o renderiza na tela do jogo.
 
 # Conceitos utilizados
 
@@ -170,6 +214,12 @@ Todo o projeto foi estruturado em torno da POO, onde cada elemento do jogo é um
 * **Estrutura de Nível**: O uso de dicionários está em `nivel.py`. A função `criar_primeiro_nivel` retorna um grande dicionário onde as chaves são strings (`"jogador1"`, `"plataformas"`, `"powerups"`) e os valores são os objetos ou listas de objetos do jogo. Em `main.py`, o `__init__` da classe `Jogo` acessa esses valores para configurar a fase (ex: `self.jogador1 = nivel["jogador1"]`).
 
 * **Configuração de Controles**: A classe `Jogador` recebe um dicionário de `controles` no `__init__`. Isso permite mapear ações (como `"esquerda"`) a teclas específicas (`pygame.K_a`), tornando a configuração dos controles flexível e fácil de entender.
+
+# Screenshots do jogo em funcionamento
+
+![Tela Inicial do Jogo](Imagens/tela%20inicial%20screenshot.png)
+
+![Screenshot da Fase](Imagens/fase_screenshot.png)
 
 # Desafios e aprendizados
 
